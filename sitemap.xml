@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>https://cedriccreusot.fr/posts/</loc>
+    <lastmod>2020-01-01T14:32:06+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cedriccreusot.fr/about/</loc>
+  </url>
+  
+  <url>
+    <loc>https://cedriccreusot.fr/</loc>
+    <lastmod>2020-01-01T14:32:06+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cedriccreusot.fr/posts/my-introduction-to-flutter/</loc>
+    <lastmod>2020-01-01T14:32:06+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cedriccreusot.fr/tags/bilan/</loc>
+    <lastmod>2020-01-01T14:22:37+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cedriccreusot.fr/tags/objectifs/</loc>
+    <lastmod>2020-01-01T14:22:37+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cedriccreusot.fr/posts/bilan-plan-2020/</loc>
+    <lastmod>2020-01-01T14:22:37+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cedriccreusot.fr/tags/</loc>
+    <lastmod>2020-01-01T14:22:37+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://cedriccreusot.fr/categories/</loc>
+  </url>
+  
+</urlset>
