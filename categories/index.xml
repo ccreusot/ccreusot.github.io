@@ -12,6 +12,53 @@
    
    
      <item>
+       <title>Flutter Bootcamp</title>
+       <link>https://cedriccreusot.fr/posts/flutter-bootcamp/</link>
+       <pubDate>Sat, 01 Feb 2020 12:52:00 +0100</pubDate>
+       
+       <guid>https://cedriccreusot.fr/posts/flutter-bootcamp/</guid>
+       <description>&lt;p&gt;Cet article va être dédié au Bootcamp Flutter vendu par The App Brewery sur leur site (que vous pouvez aussi retrouver sur Udemy).
+Il fut annoncé à la suite de la Google I/O 2019. Ayant déjà réalisé le codelabs de Google sur Flutter qui nous apprenait les base.
+Je me suis dit que c&#39;était une bonne idée de faire ce Bootcamp pour me former et gagner en expérience avec cette technologie.&lt;/p&gt;
+&lt;h2 id=&#34;accessibilité&#34;&gt;Accessibilité&lt;/h2&gt;
+&lt;p&gt;Ce Bootcamp est accessible au plus grand nombre, il n&#39;y a pas besoin de connaitre déjà Flutter pour s&#39;en sortir. Il n&#39;y a pas non plus besoin de connaitre Dart, ou de savoir programmer.&lt;/p&gt;
+&lt;p&gt;Il vous prend par la main pour débuter.&lt;/p&gt;
+&lt;p&gt;Si vous savez déjà coder, vous n&#39;apprendrez pas via celui-ci plus de choses que vous connaissiez déjà côté programmation.&lt;/p&gt;
+&lt;p&gt;Ne pensez pas non plus y trouver un moyen d&#39;apprendre Dart. Ce Bootcamp se contente de vous montrer les bases, pour vous en sortir avec Flutter.&lt;/p&gt;
+&lt;p&gt;The App Brewery a fait un travail remarquable sur l&#39;accompagnement du débutant, les vidéos vont vous montrer souvent les réponses dont vous avez besoin pour réaliser les différents exercices.&lt;/p&gt;
+&lt;h2 id=&#34;le-bon&#34;&gt;Le bon&lt;/h2&gt;
+&lt;p&gt;Tout abord, cette formation est en Anglais, il faut donc connaitre la langue de Shakespear pour pouvoir s&#39;en sortir (et ça vous aideras à pratiquer).&lt;/p&gt;
+&lt;p&gt;La personne nous accompagnant en vidéo durant ce Bootcamp a l&#39;avantage d&#39;avoir une diction claire, qui vous permet d&#39;accélérer la vidéo, ce qui vous force à vous concentrer sur ce qui est dit et montré, et si vous n&#39;avez pas bien compris, il suffit de faire un retour arrière pour revoir la partie en question quitte à ralentir le rythme.&lt;/p&gt;
+&lt;p&gt;Pour ce qui est du contenu, on vous apprend à programmer des choses simples en Dart ce qui est un bon plus pour ceux qui débutent.&lt;/p&gt;
+&lt;p&gt;Il y a 16 sections avec selon la section des challenges. Chaque section vous apprend un concept de programmation et à l&#39;utiliser dans les challenges. Les sources des projets seront accessibles via le github de The App Brewery vous trouverez souvent un lien a ceux-ci dans la section correspondante.&lt;/p&gt;
+&lt;p&gt;Faite vraiment pause durant ses challenges, pour voir des concepts et apprendre à chercher les bons outils seuls c&#39;est vraiment un très bon exercice, prenez aussi le temps pour comprendre votre solution avant de passer à la solution proposer par The App Brewery, vous serez surpris d&#39;arriver à faire ce qu&#39;il vous demande, mais d&#39;une autre manière.&lt;/p&gt;
+&lt;p&gt;La communauté est active, vous pourrez leur poser des questions quand vous êtes bloqué sur un sujet.&lt;/p&gt;
+&lt;h2 id=&#34;ce-quil-manque&#34;&gt;Ce qu&#39;il manque&lt;/h2&gt;
+&lt;p&gt;Cette formation a du bon, mais il manque, je pense, quelques parties essentielles :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;La théorie de programmation, il ne faut pas faire impasse dessus même s’il est facile de faire du développement en Dart, cela reste un langage-objet.&lt;/li&gt;
+&lt;li&gt;Pas de tests, pour pouvoir considérer que l&#39;on est complètement opérationnel en Flutter et en Dart par transitivité, il ne faut pas les négligés. Une partie, dédier au test serait intéressant et apporterait un plus très qualitatif. Flutter et Dart offre de base tous les outils pour faire des tests.&lt;/li&gt;
+&lt;li&gt;Manque d&#39;une section, CI/CD, pas obligatoire, mais peut-être très intéressant de connaitre au moins quelque informations dessus.&lt;/li&gt;
+&lt;li&gt;Il n&#39;y a que quelques StateManagement de présentés, on vous apprend à vous servir du système de &lt;code&gt;setState({})&lt;/code&gt; et aussi de Provider.&lt;/li&gt;
+&lt;li&gt;Provider est une bonne librairie pour débuter, mais il faut vraiment faire attention avec elle (je vous laisse le lien vers &lt;a href=&#34;https://www.didierboelens.com/fr/2019/07/provider---points-dint%C3%A9r%C3%AAt---points-dattention&#34;&gt;l&#39;article de Didier Boelens sur le sujet de Provider.&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Attention ! Cette Formation n&#39;est pas à jour par rapport au changement apportée dans le langage Dart et les dernières versions de Flutter.&lt;/li&gt;
+&lt;li&gt;Certain exemple montré en Dart qui ne sont pas recommandés dans la documentation officielle du langage exemple l&#39;utilisation du &lt;a href=&#34;https://dart.dev/guides/language/effective-dart/style#dont-use-prefix-letters&#34;&gt;&amp;ldquo;k&amp;rdquo; pour préfix d&#39;une variable&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;À part, les manques énoncés, je peux recommander cette formation à toute personne qui souhaite débuter en Flutter, mais pour allez plus loin, je lui conseillerais de lire des articles et de s&#39;inscrire aux divers newsletters existants sur le sujet.&lt;/p&gt;
+&lt;p&gt;Cela reste une expérience positive, et après avoir fini l&#39;ensemble des sections vous obtiendrez une certification de complétion.
+&lt;figure&gt;
+    &lt;img src=&#34;https://cedriccreusot.fr/images/flutter_bootcamp_certifs.jpg&#34;/&gt; &lt;figcaption&gt;
+            &lt;h4&gt;Certificat Complétion Bootcamp Flutter&lt;/h4&gt;
+        &lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;p&gt;Cette formation vous donnera les bases qui seront à vous de retravailler pour devenir meilleurs.&lt;/p&gt;
+&lt;p&gt;Du coup, vous voulez débuter en Flutter ? Allez chez &lt;a href=&#34;https://www.appbrewery.co/p/flutter-development-bootcamp-with-dart&#34;&gt;The App Brewery&lt;/a&gt; ou &lt;a href=&#34;https://www.udemy.com/course/flutter-bootcamp-with-dart/?referralCode=2B7724A180C0502A2547&#34;&gt;Udemy&lt;/a&gt;.&lt;/p&gt;
+</description>
+     </item>
+   
+     <item>
        <title>Ouverture de mon blog</title>
        <link>https://cedriccreusot.fr/posts/bilan-plan-2020/</link>
        <pubDate>Wed, 01 Jan 2020 14:22:37 +0100</pubDate>
