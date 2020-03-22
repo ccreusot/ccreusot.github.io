@@ -651,59 +651,6 @@ Je me suis dit que c&#39;était une bonne idée de faire ce Bootcamp pour me for
      </item>
    
      <item>
-       <title>Ça va parler histoire et Flutter</title>
-       <link>https://cedriccreusot.fr/posts/my-introduction-to-flutter/</link>
-       <pubDate>Wed, 01 Jan 2020 14:32:06 +0100</pubDate>
-       
-       <guid>https://cedriccreusot.fr/posts/my-introduction-to-flutter/</guid>
-       <description>&lt;p&gt;Aujourd&#39;hui parlons un peu de ce framework Flutter, j&#39;en ai entendu parler réellement en 2017.
-Je venais de changer de travaille pour entrer dans une petite startup de la &amp;ldquo;green tech&amp;rdquo;, en tant que Lead Dev Android.&lt;/p&gt;
-&lt;p&gt;Je me souvenais de ce projet Dart que Google avait présenter &amp;ldquo;Sky&amp;rdquo;(&lt;a href=&#34;https://www.youtube.com/watch?v=PnIWl33YMwA)&#34;&gt;https://www.youtube.com/watch?v=PnIWl33YMwA)&lt;/a&gt;
-
-&lt;div style=&#34;position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;&#34;&gt;
-  &lt;iframe src=&#34;https://www.youtube.com/embed/PnIWl33YMwA&#34; style=&#34;position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;&#34; allowfullscreen title=&#34;YouTube Video&#34;&gt;&lt;/iframe&gt;
-&lt;/div&gt;
-
-une expérimentation d&#39;écrire une app en Dart sur mobile. Ma fois à l&#39;époque cela n&#39;avait rien d&#39;impressionnant, ils faisaient surtout tourné une démo technique
-d&#39;un rectangle au milieu de l&#39;écran.&lt;/p&gt;
-&lt;p&gt;Là, stupeur, surprise, joie. Je découvre une application mobile écrite en Dart de A à Z. D&#39;un flow de dev hyper fluide. Vous ne vous rendez pas vraiment compte,
-mais pouvoir écrire son interface graphique en live est quand même quelques choses de très pratique dans le dev mobile ou on fait surtout du front comme un dev web mais avec des spécification sur une seule plateforme.&lt;/p&gt;
-&lt;p&gt;Suite à cette présentation avec du live code, je m&#39;empresse de tester et de me documenter.
-Ce que je retient de cette technologie:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;C&#39;est que ça base n&#39;est pas cross-plateforme mais multi-plateforme. (ça tourne sur mobile, en web app, et en application de bureau&amp;hellip; si quelqu&#39;un s&#39;y met ça peut tourné sur une calculette, vue qu&#39;on y fait tourné doom dessus&amp;hellip;) (Je vous écrirait un jours un article sur la différence des 2).&lt;/li&gt;
-&lt;li&gt;La joie d&#39;avoir une interface fluide sur iOS et Android en peu de ligne de code.&lt;/li&gt;
-&lt;li&gt;Le hot-reload qui permet de voir les modifications instantanément dans son application.&lt;/li&gt;
-&lt;li&gt;La programmation reactive avec son approche plus orienté web que mobile.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Bon dérrière tout ça, en générale quand on me pose la question de comment c&#39;est fait dérrière :
-Je réponds en générale &amp;ldquo;Comme un moteur de jeu&amp;rdquo;&amp;hellip; La réaction de la personne en face de moi qui ne s&#39;intéresse pas à ça est très amusante.
-Je précise donc &amp;ldquo;Connais-tu Unity ? (le plus connus dans l&#39;industrie aujourd&#39;hui)&amp;rdquo; en générale, j&#39;ai un déclique de la personne.&lt;/p&gt;
-&lt;p&gt;Oui, les mecs qui font Flutter sont des grands malades, il refonts l&#39;ensemble des éléments graphique comme si c&#39;était pour une interface de jeu video.
-D&#39;ailleurs, on peut voir que certain dev on détourné Flutter pour faire du jeu vidéo.&lt;/p&gt;
-&lt;p&gt;Vous l&#39;aurez compris j&#39;ai été séduit par cette outils qui est arrivé sur le marché du développement mobile. Il a une approche tellement plus séduisante que
-tout les autres framework que je connais (Titanium, ionic, phonegap, xamarin, react-native, etc&amp;hellip;).&lt;/p&gt;
-&lt;p&gt;Bien que je connaisse un autre projet dans le genre qui utilise pour ça par HaXe, mais je ne m&#39;étendrais pas sur ça.&lt;/p&gt;
-&lt;p&gt;Vous - &amp;ldquo;Bon, c&#39;est bien beau ton truc, mais ça doit avoir c&#39;est tard aussi ?&amp;rdquo;
-Moi - &amp;ldquo;Oui, ça en a&amp;rdquo;&lt;/p&gt;
-&lt;p&gt;Comme toute technologie ce n&#39;est pas parfait :&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;Tout à bord, ce n&#39;est pas du cross-plateforme, il faut du coup pour avoir accès aux API du système codé des plugins via des channels.&lt;/li&gt;
-&lt;li&gt;Pour utiliser google map et bien les performance ne sont pas fameuse (même si ça c&#39;est amélioré)&lt;/li&gt;
-&lt;li&gt;Une application Flutter ne sauvegarde pas son état quand on la met en background. (Il y a des stratégies pour palier ça mais ça reste compliqué)&lt;/li&gt;
-&lt;li&gt;Dart n&#39;est pas le plus beau des langages de programmation, il reste tout de même abordable, mais il risque de vous rappeller les heures sombre de Java (saloperie de &amp;ldquo;;&amp;quot;)&lt;/li&gt;
-&lt;li&gt;Faire son application en Flutter ça peut-être sale, si on y vas exuser moi l&#39;expression &amp;ldquo;ça bite et son couteau&amp;rdquo;.&lt;/li&gt;
-&lt;li&gt;Les messages d&#39;erreur son parfois incompréhensible quand on UI devient rouge et jaune.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Mais bon, tout ça tend à s&#39;amélioré (du moins, je l&#39;espère)&lt;/p&gt;
-&lt;p&gt;J&#39;ai bon espoire pour cette technologie, c&#39;est pour ça que je m&#39;y intéresse et que je passes du temps à me formé dessus.
-Nous sommes au début de cette technologie. La communauté, grandie de jours en jours et c&#39;est exitant et éffrayant à la fois.
-Je penses que pour Flutter, il va nous falloir être rigoureux dans la réalisation de nos logiciel avec.&lt;/p&gt;
-&lt;p&gt;Sur ceux si ça vous intéresse allez donc sur le site (flutter) et testé ;-)&lt;/p&gt;
-</description>
-     </item>
-   
-     <item>
        <title>Ouverture de mon blog</title>
        <link>https://cedriccreusot.fr/posts/bilan-plan-2020/</link>
        <pubDate>Wed, 01 Jan 2020 14:22:37 +0100</pubDate>
