@@ -1,0 +1,722 @@
+<!doctype html>
+
+<html lang="fr-fr">
+
+<head>
+  <title>Cédric Creusot</title>
+  <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="The HTML5 Herald" />
+<meta name="author" content="" /><meta property="og:title" content="TDD en Dart" />
+<meta property="og:description" content="Qu&#39;est-ce que le TDD ? C&#39;est une méthode de développement de logiciel qui pousse l&#39;écriture des tests avant le code du logiciel.
+L&#39;origine viendrait d&#39;abord du mouvement TFD (Test First Developement), ce qu&#39;apporte le TDD c&#39;est la partie dite de réécriture de code (Refactoring).
+La technique est assez simple, et se fait en 3 étapes:
+ On écrit un test qui échoue. On écrit le code correspondant pour valider le test." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cedriccreusot.fr/posts/bankaccount-kata-dart/" />
+<meta property="article:published_time" content="2020-03-22T11:17:00+01:00" />
+<meta property="article:modified_time" content="2020-03-22T11:17:00+01:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="TDD en Dart"/>
+<meta name="twitter:description" content="Qu&#39;est-ce que le TDD ? C&#39;est une méthode de développement de logiciel qui pousse l&#39;écriture des tests avant le code du logiciel.
+L&#39;origine viendrait d&#39;abord du mouvement TFD (Test First Developement), ce qu&#39;apporte le TDD c&#39;est la partie dite de réécriture de code (Refactoring).
+La technique est assez simple, et se fait en 3 étapes:
+ On écrit un test qui échoue. On écrit le code correspondant pour valider le test."/>
+
+<meta name="generator" content="Hugo 0.62.2" />
+    
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha256-l85OmPOjvil/SOvVt3HnSSjzF1TUMyT9eV0c2BzEGzU=" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cedriccreusot.fr/fontawesome/css/all.min.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab|Ruda" />
+  <link rel="stylesheet" type="text/css" href="/css/styles.css" /></head>
+
+<body>
+  <div id="container">
+    <header>
+      <h1>
+                <a href="/">Cédric Creusot</a>
+            </h1>
+
+      <ul id="social-media">
+      </ul>
+      
+      <p><em>Artisan Logiciel sur Mobile</em></p>
+      
+    </header>
+
+    
+<nav>
+    <ul>
+        
+        <li>
+            <a class="" href="/posts/">
+                <i class="fa-li fa  fa-lg"></i><span>Articles</span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="" href="/about/">
+                <i class="fa-li fa  fa-lg"></i><span>À propos</span>
+            </a>
+        </li>
+        
+    </ul>
+</nav>
+
+    <main>
+
+
+
+
+<article>
+
+    <h1>TDD en Dart</h1>
+
+    
+        <aside>
+    <ul>
+        <li>
+            <time class="post-date" datetime="2020-03-22T11:17:00&#43;01:00">Mar 22, 2020</time>
+        </li>
+        
+
+        
+        <li>
+            <em>
+                
+                    
+                    <a href="/tags/kata">#kata</a>
+                
+                    , 
+                    <a href="/tags/dart">#dart</a>
+                
+            </em>
+        </li>
+        
+
+        <li>14 minutes read</li>
+    </ul>
+</aside>
+
+    
+
+    <p>Qu'est-ce que le TDD ? C'est une méthode de développement de logiciel qui pousse l'écriture des tests avant le code du logiciel.</p>
+<p>L'origine viendrait d'abord du mouvement TFD (Test First Developement), ce qu'apporte le TDD c'est la partie dite de réécriture de code (Refactoring).</p>
+<p>La technique est assez simple, et se fait en 3 étapes:</p>
+<ol>
+<li>On écrit un test qui échoue.</li>
+<li>On écrit le code correspondant pour valider le test.</li>
+<li>On vérifie s’il n'y a pas de refactoring possible.</li>
+</ol>
+<p>Les 3 étapes énumérées au-dessus doivent être réalisées en itération.
+C'est-à-dire, vous devez faire ces étapes autant de fois que nécessaires qu'il y a de tests à produire.</p>
+<figure>
+    <img src="/images/tdd_flow.svg"/> <figcaption>
+            <h4>Schéma des 3 étapes du TDD</h4>
+        </figcaption>
+</figure>
+
+<p>La théorie est jolie, mais comment s'y prend-on ?</p>
+<p>Et bien comme l'adage le dit :</p>
+<blockquote>
+<p>C'est en forgeant que l'on devient forgeron !</p>
+</blockquote>
+<p>Nous allons donc mettre ces règles en pratique ! Comment ? En utilisant un Kata ! Comme dans les arts martiaux, nous allons nous entrainer !</p>
+<figure>
+    <img src="https://media.giphy.com/media/mKPTMhAlmhlRu/giphy.gif"/> 
+</figure>
+
+<p>Illustrons cela par un cas assez complexe : <a href="https://kata-log.rocks/banking-kata"><strong>BankAccount</strong></a></p>
+<p>Nous nous exercerons avec Dart.</p>
+<p>Que nous dit l'énoncé ?
+Il faut écrire une classe <code>Account</code> qui doit offrir 3 fonctionnalités déposées de l'argent, retirer de l'argent et enfin retourner une description des opérations.</p>
+<p>Exemple :</p>
+<pre><code>Date        Amount  Balance
+24.12.2015   +500      500
+23.8.2016    -100      400
+</code></pre><p>Dans un premier temps, si vous n'avez pas installé Dart suivez les instructions <a href="https://dart.dev/get-dart"><strong>ici</strong></a>,
+puis créez-vous un nouveau projet en mode <a href="https://dart.dev/tutorials/server/get-started"><strong>console</strong></a>.</p>
+<p>Vous devriez avoir votre projet sous cette forme :</p>
+<pre><code>bankaccount --&gt; bin/main.dart
+            |-&gt; lib/bankaccount.dart
+            |-&gt; test/bankaccount_test.dart
+            |-&gt; analysis_options.yaml
+            |-&gt; pubspec.yaml
+            |-&gt; README.md
+            |-&gt; CHANGELOG.md
+            |-&gt; pubspec.lock
+            |-&gt; .packages
+            |-&gt; .gitignore
+            |-&gt; .dart_tool
+</code></pre><h2 id="fonction-depositint">Fonction <code>deposit(int)</code></h2>
+<h3 id="écrire-son-premier-test">Écrire son premier test</h3>
+<p>Nous avons un biais, qui est de vouloir écrire directement ce que l'on nous demande.</p>
+<p>Alors que faut-il faire en TDD pour écrire son premier test ?</p>
+<p>Mon premier conseil est de commencer par ce qui ne correspond pas au scope.</p>
+<p>Prenons la première méthode qui est de déposer de l'argent. Si l'on réfléchit à ce que doit faire cette méthode, elle doit permettre de déposer une somme d'argent positive et jamais négative.</p>
+<p>Notre premier test devrait ressembler à ceci :</p>
+<pre><code>import 'package:bankaccount/bankaccount.dart';
+import 'package:test/test.dart';
+
+void main() {
+  test('deposit negative number should throw an invalid argument exception', () {
+    Account account = Account();
+
+    expect(() =&gt; account.deposit(-1), throwsA(
+      isA&lt;ArgumentError&gt;().having(
+        (error) =&gt; error.message,
+        &quot;message&quot;,
+        &quot;You can't deposit negative value&quot;)));
+  });
+}
+</code></pre><p>Nous nous assurons que la somme déposée ne sera jamais négative. Donc quand on fait un dépôt d'argent négatif, notre class Account doit émettre une erreur, même si cela n'est clairement pas demander dans notre énoncé nous devons prévoir les cas d'erreur.</p>
+<p>Notre premier test est écrit à l'exécution de celui-ci nous allons fatalement avoir un message d'erreur, or c'est ce que l'on souhaite.
+Le message d'erreur va nous indiquer que la fonction n'existe pas.</p>
+<p>Ajoutons, la méthode <code>deposit(int)</code> à notre Account:</p>
+<pre><code>class Account {
+  void deposit(int value) {
+  }
+}
+</code></pre><p>Sans l'implémenter, nous allons exécuter notre test :</p>
+<pre><code>pub run test
+00:01 +0 -1: test\bankaccount_test.dart: deposit negative number should throw an invalid argument exception [E]
+  Expected: throws &lt;Instance of 'ArgumentError'&gt; with `message`: 'You can\'t deposit negative value'
+    Actual: &lt;Closure: () =&gt; void&gt;
+     Which: returned &lt;null&gt;
+
+  package:test_api                 expect
+  test\bankaccount_test.dart 10:5  main.&lt;fn&gt;
+
+00:01 +0 -1: Some tests failed.
+</code></pre><p>Très bien, le moteur de test nous indique que la méthode ne fait pas ce qui est attendu.
+Il nous suffit ensuite d'ajouter ce qu'il manque à celle-ci :</p>
+<pre><code>class Account {
+  void deposit(int value) {
+    throw ArgumentError(&quot;You can't deposit negative value&quot;);
+  }
+}
+</code></pre><p>On exécute le test de nouveau et nous devrions réussir à le passer cette fois :</p>
+<pre><code>pub run test
+00:01 +1: All tests passed!
+</code></pre><p>Premier test réussi ! Améliorons ça avec le 2nd.</p>
+<h3 id="second-test">Second test</h3>
+<p>Le second test ici sera encore un cas d'exception. Il nous faut couvrir le cas : chercher à ne déposer aucune somme (ou en tout cas 0).</p>
+<p>Ajoutons notre nouveau test à notre fichier :</p>
+<pre><code>  test('deposit 0 should throw an invalid argument exception', () {
+    Account account = Account();
+
+    expect(() =&gt; account.deposit(0), throwsA(
+      isA&lt;ArgumentError&gt;().having(
+        (error) =&gt; error.message,
+        &quot;message&quot;,
+        &quot;You can't deposit 0&quot;)));
+  });
+</code></pre><p>Exécutons les tests à nouveau.</p>
+<pre><code>pub run test
+00:01 +1 -1: test\bankaccount_test.dart: deposit 0 should throw an invalid argument exception [E]
+  Expected: throws &lt;Instance of 'ArgumentError'&gt; with `message`: 'You can\'t deposit 0' 
+    Actual: &lt;Closure: () =&gt; void&gt;
+     Which: threw ArgumentError:&lt;Invalid argument(s): You can't deposit negative value&gt; 
+            stack package:bankaccount/bankaccount.dart 7:5  Account.deposit
+                  test\bankaccount_test.dart 20:26          main.&lt;fn&gt;.&lt;fn&gt;
+                  package:test_api                          expect
+                  test\bankaccount_test.dart 20:5           main.&lt;fn&gt;
+
+            which has `message` with value 'You can\'t deposit negative value' which is 
+different.
+                  Expected: ... t deposit 0
+                    Actual: ... t deposit negative v ...
+                                          ^
+                   Differ at offset 18
+
+  package:test_api                 expect
+  test\bankaccount_test.dart 20:5  main.&lt;fn&gt;
+
+00:01 +1 -1: Some tests failed.
+</code></pre><p>Le premier test continue de fonctionnaire or le second, ne passe pas non plus. Il y a ici une petite subtilité, nous avons changé le message d'erreur attendue.</p>
+<p>Donc pour résoudre ce problème, il suffirait de rajouter ce message d'erreur dans notre classe <code>Account</code> :</p>
+<pre><code>class Account {
+  void deposit(int value) {
+    if (value == 0) {
+      throw ArgumentError(&quot;You can't deposit 0&quot;);
+    }
+    throw ArgumentError(&quot;You can't deposit negative value&quot;);
+  }
+}
+</code></pre><p>En exécutant la commande pour les tests :</p>
+<pre><code>pub run test
+00:01 +2: All tests passed!
+</code></pre><p>Nous avons un message nous indiquant que les 2 tests passent.</p>
+<h3 id="troisième--quatrième-test">Troisième &amp; Quatrième test</h3>
+<p>Prenons un instant pour comprendre l'intérêt d'avoir fait les 2 premiers tests avant d'entamer le 3ème test.</p>
+<p>Pourquoi avoir fait ces 2 tests alors qu'il aurait bien pu suffire de se concentrer que sur le périmètre fonctionnel ?</p>
+<p>Prenons le schéma suivant :</p>
+<p>[Mettre le schéma]</p>
+<p>L'intérêt de faire 2 tests farfelus était pour prévoir des cas d'erreurs, pouvant intervenir lorsque l'utilisateur de notre
+classe n'utilise pas celle-ci dans le petit périmètre défini.</p>
+<p>À chaque périmètre d'erreur géré, on rend donc notre logiciel plus robuste.</p>
+<p>Le dernier test est donc le test fonctionnel, l'attendue que l'on nous demande depuis le début. Ici pour la méthode <code>deposit()</code> ce sera
+ajouter une somme d'argent au compte.</p>
+<p>Notre &ldquo;dernier&rdquo; test.</p>
+<pre><code>  test('deposit positive value should return new Account with positive balance', () {
+    Account account = Account();
+
+    Account newAccount = account.deposit(1);
+
+    expect(newAccount.balance(), 1);
+  });
+</code></pre><p>Remarqués, ici nous ne cherchons pas à tester le retour du print statement, nous le verrons bien plus tard.
+Ici pour vérifier que l'on ajoute bien de l'argent à notre compte, nous utilisons pour l'instant une fonction qui calcule la balance de celui-ci.</p>
+<p>Nous obtenons donc :</p>
+<pre><code>class Account {
+  Account deposit(int value) {
+    if (value == 0) {
+      throw ArgumentError(&quot;You can't deposit 0&quot;);
+    } 
+    if (value &lt; 0) {
+      throw ArgumentError(&quot;You can't deposit negative value&quot;);
+    }
+    return Account();
+  }
+
+  int balance() {
+    return 1;
+  }
+}
+</code></pre><p>Eh oui, ici, j'ai décidé de tricher. Comment donc m'assurer que j'ai bien ajouter le l'argent ? Avec un 4ème test&hellip;</p>
+<pre><code>  test('deposit 10 then 100 should return new Account with 110 for balance', () {
+    Account account = Account();
+
+    Account tmp = account.deposit(10);
+    Account newAccount = tmp.deposit(100);
+
+    expect(newAccount.balance, 110);
+  });
+</code></pre><p>Ce qui nous donneras cette implémentation :</p>
+<pre><code>class Account {
+  final int balance;
+
+  Account({this.balance = 0});
+
+  Account deposit(int value) {
+    if (value == 0) {
+      throw ArgumentError(&quot;You can't deposit 0&quot;);
+    } 
+    if (value &lt; 0) {
+      throw ArgumentError(&quot;You can't deposit negative value&quot;);
+    }
+    return Account(balance: balance + value);
+  }
+}
+</code></pre><p>Nous avons une classe Account qui nous permet de déposer de l'argent ! Et qui nous fournis la balance courante.</p>
+<h2 id="fonction-withdrawint">Fonction <code>withdraw(int)</code></h2>
+<p>Même opération pour le withdraw, à l'exception que l'on n’aura pas besoin d'écrire 4 cas de test. Ici on en écrira que 3. Je vous laisse expérimenter par vous-même. ;-)</p>
+<p>Garder en tête que vous devez toujours tester l'inconnue qui est en dehors de votre scope.</p>
+<figure>
+    <img src="/images/tdd_scope.svg"/> <figcaption>
+            <h4>Schéma de différent scopes en TDD</h4>
+        </figcaption>
+</figure>
+
+<p>Remarques :</p>
+<ul>
+<li>
+<p>Vous aurez remarqué que j'ai fait le choix de renvoyer un nouveau Account à chaque ajout. Faite de même pour le retrait. C'est un choix personnel, un petit défi supplémentaire que j'ai choisi de m'imposer.</p>
+</li>
+<li>
+<p>Ici nous passons souvent par une phase Écriture du Test -&gt; Exécution du dit Test -&gt; Validation de Échec -&gt; Écriture de la solution -&gt; réexécution du Test -&gt; Validation du passage du Test.
+Or il nous manque souvent cette phase de réfactorisation. Celle-ci peut s'appliquer sur les Tests comme sur le code implémenté.</p>
+</li>
+</ul>
+<p>Nous respectons pas pour l'instant ce schéma : <figure>
+    <img src="/images/tdd_flow.svg"/> 
+</figure>
+</p>
+<p>Passons à l'étape du <code>printStatement()</code> qui doit nous retourner une chaine de caractère. Nous verrons le refactoring, mais un peu plus tard, c'est souvent une appréciation personnelle.</p>
+<h2 id="fonction-string-printstatement">Fonction <code>String printStatement()</code></h2>
+<p>Pour illustrer que l'on ne pense pas à tout, je vais me baser sur la première idée que j'aurais pour faire un test pour cette méthode.</p>
+<pre><code>    test('printStatement after a deposit should show the date of the deposit and the value given and the current balance',
+      () {
+    var account = Account();
+
+    var statement = account.deposit(500).printStatement();
+
+    var currentDate = DateTime.now();
+
+    expect(statement, '''
+    Date\t\t\t\tAmount\t\t\t\tBalance
+    ${currentDate.day}.${currentDate.month}.${currentDate.year}\t\t\t\t500\t\t\t\t500
+    ''');
+
+  });
+</code></pre><p>Mon code de <code>printStatement()</code> pour l'instant ressemble à ça :</p>
+<pre><code>  String printStatement() {
+    return null;
+  }
+</code></pre><p>Cela ne vous surprendra donc pas que ce test va échouer. Pour résoudre l'erreur, il suffit donc d'implémenter la méthode :</p>
+<pre><code>  String printStatement() {
+    var currentDate = DateTime.now();
+    return '''
+    Date\t\t\t\tAmount\t\t\t\tBalance
+    ${currentDate.day}.${currentDate.month}.${currentDate.year}\t\t\t\t$balance\t\t\t\t$balance
+    ''';
+  }
+</code></pre><p>Ce test me tracasse, il semblerait que j'ai souhaité allez un peu trop vite.
+Le premier test que j'aurais dû appliquer est celui-ci :</p>
+<pre><code>  test('printStatement without statement deposit', () {
+    var account = Account();
+
+    var statement = account.printStatement();
+
+    expect(statement, '''
+    Date\t\t\t\tAmount\t\t\t\tBalance
+        \t\t\t\t      \t\t\t\t0
+    ''');
+  });
+</code></pre><p>En effet, si je possède un tout nouveau compte, il est normal de n'avoir aucune opération et une balance de 0. Ce choix est arbitraire.
+J'aurais très bien pu me concentrer sur le retour de la première ligne.</p>
+<p>Remarque en rajoutant ce test, je me suis rendue à l'évidence qu'il serait préférable de parler de ces opérations.
+J'ai donc choisi de refactorer la classe <code>Account</code> de cette façon :</p>
+<pre><code>class Account {
+  final List&lt;Transaction&gt; transactions;
+
+  int get balance =&gt;
+      transactions.fold(0, (previous, current) =&gt; previous + current.value);
+
+  Account({this.transactions = const []});
+
+  Account deposit(int value) {
+    if (value == 0) {
+      throw ArgumentError(&quot;You can't deposit 0&quot;);
+    }
+    if (value &lt; 0) {
+      throw ArgumentError(&quot;You can't deposit negative value&quot;);
+    }
+    var newList = List.of(transactions);
+    newList.add(Transaction(value));
+    return Account(transactions: newList);
+  }
+
+  Account withdraw(int value) {
+    if (value == 0) {
+      throw ArgumentError(&quot;You can't withdraw 0&quot;);
+    }
+    if (value &lt; 0) {
+      throw ArgumentError(&quot;You can't withdraw negative value&quot;);
+    }
+    var newList = List.of(transactions);
+    newList.add(Transaction(-value));
+    return Account(transactions: newList);
+  }
+
+  String printStatement() {
+    var currentDate = DateTime.now();
+    if (transactions.isEmpty) {
+      return '''
+    Date\t\t\t\tAmount\t\t\t\tBalance
+        \t\t\t\t      \t\t\t\t$balance
+    ''';
+    }
+    return '''
+    Date\t\t\t\tAmount\t\t\t\tBalance
+    ${currentDate.day}.${currentDate.month}.${currentDate.year}\t\t\t\t$balance\t\t\t\t$balance
+    ''';
+  }
+}
+</code></pre><p>J'ai choisi de matérialiser les transactions, et je garde toujours ma propriété qui me permet de calculer la balance.
+La classe <code>Transaction</code> :</p>
+<pre><code>class Transaction {
+  final DateTime date = DateTime.now();
+  final int value;
+
+  Transaction(this.value);
+}
+</code></pre><p>Passons à la suite.</p>
+<h3 id="le-dernier-test">Le dernier test</h3>
+<p>J'opte pour l'utilisation de plusieurs opérations pour vérifier si mon algorithme pour le <code>String printStatement()</code> va fonctionner.</p>
+<pre><code>    test(
+      'printStatement after a deposit and withdraw should show the date of the deposits and the values given and the current balance for each operations',
+      () {
+    var account = Account();
+
+    var statement = account.deposit(500).withdraw(100).deposit(200).printStatement();
+
+    var currentDate = DateTime.now();
+
+    expect(statement, '''
+    Date\t\t\t\tAmount\t\t\t\tBalance
+    ${currentDate.day}.${currentDate.month}.${currentDate.year}\t\t\t\t500\t\t\t\t500
+    ${currentDate.day}.${currentDate.month}.${currentDate.year}\t\t\t\t-100\t\t\t\t400
+    ${currentDate.day}.${currentDate.month}.${currentDate.year}\t\t\t\t200\t\t\t\t600
+    ''');
+  });
+</code></pre><p>Ce qui nous donne cette solution :</p>
+<pre><code>  String printStatement() {
+    var balance = 0;
+    if (transactions.isEmpty) {
+      return '''
+    Date\t\t\t\tAmount\t\t\t\tBalance
+        \t\t\t\t      \t\t\t\t$balance
+    ''';
+    }
+    var transactionStatements = &lt;String&gt;[];
+    for (var transaction in transactions) {
+      balance += transaction.value;
+      transactionStatements.add(&quot;${transaction.date.day}.${transaction.date.month}.${transaction.date.year}\t\t\t\t${transaction.value}\t\t\t\t$balance&quot;);
+    }
+    return '''
+    Date\t\t\t\tAmount\t\t\t\tBalance${transactionStatements.fold(&quot;&quot;, (previous, current) =&gt; previous + &quot;\n    &quot; + current)}
+    ''';
+  }
+</code></pre><p>Les tests passes tous, mais je considère que le code dans l'ensemble peut-être amélioré.</p>
+<h3 id="refactoring">Refactoring</h3>
+<p>Que peut-on améliorer ? Sur le dernier test nous nous basons que sur la date en cours. Or, l'<code>Account</code> peut être créée et vivre très longtemps dans le temps, il faut pouvoir le modéliser. Comment y procéder ?</p>
+<p>Je dirais en créant une interface qui permet de délivrer la date du jour.
+En Dart nous n’avons pas la possibilité de faire des interfaces alors nous partons sur une classe abstraite.</p>
+<pre><code>abstract class DateProvider {
+  DateTime current();
+}
+</code></pre><p>Nous pouvons maintenant procéder à une évolution de la classe <code>Account</code></p>
+<pre><code>class Account {
+  final List&lt;Transaction&gt; transactions;
+  final DateProvider _dateProvider;
+
+  Account(this._dateProvider, {this.transactions = const []});
+
+  Account deposit(int value) {
+    if (value == 0) {
+      throw ArgumentError(&quot;You can't deposit 0&quot;);
+    }
+    if (value &lt; 0) {
+      throw ArgumentError(&quot;You can't deposit negative value&quot;);
+    }
+    var newList = List.of(transactions);
+    newList.add(Transaction(_dateProvider.current(), value));
+    return Account(_dateProvider, transactions: newList);
+  }
+
+  Account withdraw(int value) {
+    if (value == 0) {
+      throw ArgumentError(&quot;You can't withdraw 0&quot;);
+    }
+    if (value &lt; 0) {
+      throw ArgumentError(&quot;You can't withdraw negative value&quot;);
+    }
+    var newList = List.of(transactions);
+    newList.add(Transaction(_dateProvider.current(), -value));
+    return Account(_dateProvider, transactions: newList);
+  }
+
+  String printStatement() {
+    var balance = 0;
+    if (transactions.isEmpty) {
+      return '''
+    Date\t\t\t\tAmount\t\t\t\tBalance
+        \t\t\t\t      \t\t\t\t$balance
+    ''';
+    }
+    var transactionStatements = &lt;String&gt;[];
+    for (var transaction in transactions) {
+      balance += transaction.value;
+      transactionStatements.add(&quot;${transaction.date.day}.${transaction.date.month}.${transaction.date.year}\t\t\t\t${transaction.value}\t\t\t\t$balance&quot;);
+    }
+    return '''
+    Date\t\t\t\tAmount\t\t\t\tBalance${transactionStatements.fold(&quot;&quot;, (previous, current) =&gt; previous + &quot;\n    &quot; + current)}
+    ''';
+  }
+}
+</code></pre><p>Très bien notre classe a évolué, mais que pouvons-nous faire pour les tests ? Parce que a vue d'oeil cela ne change pas grand-chose.
+Et bien l'avantage d'utiliser maintenant une classe abstraite <code>DateProvider</code> nous pouvons facilement la mocker dans les tests</p>
+<pre><code>class MockDateProvider extends Mock implements DateProvider {}
+
+test(
+      'printStatement after a deposit and withdraw should show the date of the deposits and the values given and the current balance for each operations',
+      () {
+    when(dateProvider.current()).thenReturn(DateTime.utc(2019, 2, 2));
+    var newAccount = account.deposit(500);
+    when(dateProvider.current()).thenReturn(DateTime.utc(2019, 6, 24));
+    newAccount = newAccount.withdraw(100);
+    when(dateProvider.current()).thenReturn(DateTime.utc(2020, 1, 29));
+    newAccount = newAccount.deposit(200);
+    var statement = newAccount.printStatement();
+
+    expect(statement, '''
+    Date\t\t\t\tAmount\t\t\t\tBalance
+    2.2.2019\t\t\t\t500\t\t\t\t500
+    24.6.2019\t\t\t\t-100\t\t\t\t400
+    29.1.2020\t\t\t\t200\t\t\t\t600
+    ''');
+  });
+</code></pre><p>Comme vous pouvez le voir, nous avons un meilleur contrôle sur la date, donc nous pouvons faire voyager dans le temps nos transactions.</p>
+<p>Nous avons donc réglé ce problème de temps. Il reste un dernier point. Il y a plusieurs tests qui dans leurs finalités ne servent plus à rien.</p>
+<p>L'utilisation de la balance n'a plus vraiment d'intérêt. C'est pour ça que nous allons nous en séparer et de même pour les tests qui l'utilisent.</p>
+<p>Ce qui donne ce refactoring final pour la classe <code>Account</code> :</p>
+<pre><code>class Account {
+  final List&lt;Transaction&gt; transactions;
+  final DateProvider _dateProvider;
+
+  Account(this._dateProvider, {this.transactions = const []});
+
+  Account deposit(int value) {
+    if (value == 0) {
+      throw ArgumentError(&quot;You can't deposit 0&quot;);
+    }
+    if (value &lt; 0) {
+      throw ArgumentError(&quot;You can't deposit negative value&quot;);
+    }
+    var newList = List.of(transactions);
+    newList.add(Transaction(_dateProvider.current(), value));
+    return Account(_dateProvider, transactions: newList);
+  }
+
+  Account withdraw(int value) {
+    if (value == 0) {
+      throw ArgumentError(&quot;You can't withdraw 0&quot;);
+    }
+    if (value &lt; 0) {
+      throw ArgumentError(&quot;You can't withdraw negative value&quot;);
+    }
+    var newList = List.of(transactions);
+    newList.add(Transaction(_dateProvider.current(), -value));
+    return Account(_dateProvider, transactions: newList);
+  }
+
+  String printStatement() {
+    var balance = 0;
+    if (transactions.isEmpty) {
+      return '''
+    Date\t\t\t\tAmount\t\t\t\tBalance
+        \t\t\t\t      \t\t\t\t$balance
+    ''';
+    }
+    var transactionStatements = &lt;String&gt;[];
+    for (var transaction in transactions) {
+      balance += transaction.value;
+      transactionStatements.add(&quot;${transaction.date.day}.${transaction.date.month}.${transaction.date.year}\t\t\t\t${transaction.value}\t\t\t\t$balance&quot;);
+    }
+    return '''
+    Date\t\t\t\tAmount\t\t\t\tBalance${transactionStatements.fold(&quot;&quot;, (previous, current) =&gt; previous + &quot;\n    &quot; + current)}
+    ''';
+  }
+}
+</code></pre><p>Et enfin les tests dans leurs états finaux :</p>
+<pre><code>class MockDateProvider extends Mock implements DateProvider {}
+
+void main() {
+  var dateProvider;
+  var account;
+  setUp(() {
+    dateProvider = MockDateProvider();
+    account = Account(dateProvider);
+  });
+
+  test('deposit negative number should throw an invalid argument exception',
+      () {
+    expect(
+        () =&gt; account.deposit(-1),
+        throwsA(isA&lt;ArgumentError&gt;().having((error) =&gt; error.message, 'message',
+            &quot;You can't deposit negative value&quot;)));
+  });
+
+  test('deposit 0 should throw an invalid argument exception', () {
+    expect(
+        () =&gt; account.deposit(0),
+        throwsA(isA&lt;ArgumentError&gt;().having(
+            (error) =&gt; error.message, 'message', &quot;You can't deposit 0&quot;)));
+  });
+
+  test('withdraw negative number should throw an invalid argument exception',
+      () {
+    expect(
+        () =&gt; account.withdraw(-1),
+        throwsA(isA&lt;ArgumentError&gt;().having((error) =&gt; error.message, 'message',
+            &quot;You can't withdraw negative value&quot;)));
+  });
+
+  test('withdraw 0 should throw an invalid argument exception', () {
+    expect(
+        () =&gt; account.withdraw(0),
+        throwsA(isA&lt;ArgumentError&gt;().having(
+            (error) =&gt; error.message, 'message', &quot;You can't withdraw 0&quot;)));
+  });
+
+  test('printStatement without statement deposit', () {
+    var statement = account.printStatement();
+
+    expect(statement, '''
+    Date\t\t\t\tAmount\t\t\t\tBalance
+        \t\t\t\t      \t\t\t\t0
+    ''');
+  });
+
+  test(
+      'printStatement after a deposit and withdraw should show the date of the deposits and the values given and the current balance for each operations',
+      () {
+    when(dateProvider.current()).thenReturn(DateTime.utc(2019, 2, 2));
+    var newAccount = account.deposit(500);
+    when(dateProvider.current()).thenReturn(DateTime.utc(2019, 6, 24));
+    newAccount = newAccount.withdraw(100);
+    when(dateProvider.current()).thenReturn(DateTime.utc(2020, 1, 29));
+    newAccount = newAccount.deposit(200);
+    var statement = newAccount.printStatement();
+
+    expect(statement, '''
+    Date\t\t\t\tAmount\t\t\t\tBalance
+    2.2.2019\t\t\t\t500\t\t\t\t500
+    24.6.2019\t\t\t\t-100\t\t\t\t400
+    29.1.2020\t\t\t\t200\t\t\t\t600
+    ''');
+  });
+}
+</code></pre><p>Mot de la fin, il y a bien entendu pas qu'une façon de faire ce genre d'exercice. L'idée ici était de vous entrainez à la méthode TDD en vous faisant parcourir avec moi, un exercice tel que le BankAccount.</p>
+<p>Retenez ce schéma :</p>
+<figure>
+    <img src="/images/tdd_flow.svg"/> <figcaption>
+            <h4>Les 3 étapes du TDD</h4>
+        </figcaption>
+</figure>
+
+<p>Essayez-vous aux autres exercices pour vous entrainer ! Variez les langages et technologies utilisées. Ils sont utiles lors d'apprentissage d'un nouveau langage. Donc, entrainez-vous ! Seule ou à plusieurs ;-)</p>
+<figure>
+    <img src="https://media.giphy.com/media/xUA7aT2aKuDQqZLcOs/giphy.gif"/> 
+</figure>
+
+<p><a href="https://fr.wikipedia.org/wiki/Test_driven_development">source: Wikipedia</a></p>
+<p><a href="https://kata-log.rocks/banking-kata">source: Kata-log.rocks</a></p>
+
+
+</article>
+
+
+<section class="post-nav">
+    <ul>
+        
+        <li>
+            <a href="https://cedriccreusot.fr/posts/flutter-bootcamp/"><i class="fa fa-chevron-circle-left"></i> Flutter Bootcamp</a>
+        </li>
+        
+        
+    </ul>
+</section>
+    
+    
+
+
+
+
+
+</main>
+    <footer>
+        <h6>Copyright © 2019 - Cédric Creusot |
+            Rendered by <a href="https://gohugo.io" title="Hugo">Hugo</a> |
+            <a href="https://cedriccreusot.fr/index.xml">Subscribe </a></h6>
+    </footer>
+</div>
+<script src="/js/scripts.js"></script>
+
+</body>
+
+</html>
+
