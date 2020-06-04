@@ -1,0 +1,171 @@
+<!doctype html>
+
+<html lang="fr-fr">
+
+<head>
+  <title>Cédric Creusot</title>
+  <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="The HTML5 Herald" />
+<meta name="author" content="" /><meta property="og:title" content="Utilisation de Timer avec Flutter" />
+<meta property="og:description" content="Durant le confinement, je souhaitais créer une application de pomodoro toute simple. J&rsquo;ai donc choisi d&rsquo;utiliser Flutter pour ça. Étant donné la facilité de faire des prototypes avec Flutter, je me suis dit que ce serait l&rsquo;occasion de pratiquer.
+Qui dit Pomodoro, dit Timer Avantage de Flutter, c&rsquo;est Dart, il a une panoplie d&rsquo;outils bien utiles pour la réalisation d&rsquo;application. J&rsquo;ai donc découvert la classe Timer.
+La documentation est très légère et ne nous indique pas ce qui se passe sous le capot :" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://cedriccreusot.fr/posts/timer-and-flutter/" />
+<meta property="article:published_time" content="2020-06-04T14:27:07+02:00" />
+<meta property="article:modified_time" content="2020-06-04T14:27:07+02:00" />
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Utilisation de Timer avec Flutter"/>
+<meta name="twitter:description" content="Durant le confinement, je souhaitais créer une application de pomodoro toute simple. J&rsquo;ai donc choisi d&rsquo;utiliser Flutter pour ça. Étant donné la facilité de faire des prototypes avec Flutter, je me suis dit que ce serait l&rsquo;occasion de pratiquer.
+Qui dit Pomodoro, dit Timer Avantage de Flutter, c&rsquo;est Dart, il a une panoplie d&rsquo;outils bien utiles pour la réalisation d&rsquo;application. J&rsquo;ai donc découvert la classe Timer.
+La documentation est très légère et ne nous indique pas ce qui se passe sous le capot :"/>
+
+<meta name="generator" content="Hugo 0.71.0" />
+    
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha256-l85OmPOjvil/SOvVt3HnSSjzF1TUMyT9eV0c2BzEGzU=" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cedriccreusot.fr/fontawesome/css/all.min.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Slab|Ruda" />
+  <link rel="stylesheet" type="text/css" href="/css/styles.css" /></head>
+
+<body>
+  <div id="container">
+    <header>
+      <h1>
+                <a href="/">Cédric Creusot</a>
+            </h1>
+
+      <ul id="social-media">
+      </ul>
+      
+      <p><em>Artisan Logiciel sur Mobile</em></p>
+      
+    </header>
+
+    
+<nav>
+    <ul>
+        
+        <li>
+            <a class="" href="/posts/">
+                <i class="fa-li fa  fa-lg"></i><span>Articles</span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="" href="/about/">
+                <i class="fa-li fa  fa-lg"></i><span>À propos</span>
+            </a>
+        </li>
+        
+    </ul>
+</nav>
+
+    <main>
+
+
+
+
+<article>
+
+    <h1>Utilisation de Timer avec Flutter</h1>
+
+    
+        <aside>
+    <ul>
+        <li>
+            <time class="post-date" datetime="2020-06-04T14:27:07&#43;02:00">Jun 4, 2020</time>
+        </li>
+        
+
+        
+        <li>
+            <em>
+                
+                    
+                    <a href="/tags/flutter">#flutter</a>
+                
+            </em>
+        </li>
+        
+
+        <li>3 minutes read</li>
+    </ul>
+</aside>
+
+    
+
+    <p>Durant le confinement, je souhaitais créer une application de pomodoro toute simple. J&rsquo;ai donc choisi d&rsquo;utiliser Flutter pour ça.
+Étant donné la facilité de faire des prototypes avec Flutter, je me suis dit que ce serait l&rsquo;occasion de pratiquer.</p>
+<h2 id="qui-dit-pomodoro-dit-timer">Qui dit Pomodoro, dit Timer</h2>
+<p>Avantage de Flutter, c&rsquo;est Dart, il a une panoplie d&rsquo;outils bien utiles pour la réalisation d&rsquo;application.
+J&rsquo;ai donc découvert la classe Timer.</p>
+<p>La documentation est très légère et ne nous indique pas ce qui se passe sous le capot :</p>
+<pre><code>A count-down timer that can be configured to fire once or repeatedly.
+
+The timer counts down from the specified duration to 0. When the timer reaches 0, the timer invokes the specified callback function. Use a periodic timer to repeatedly count down the same interval.
+</code></pre><p>Je me suis principalement servie de <code>Timer.periodic(...)</code> qui permet comme son nom l&rsquo;indique de créer un timer qui va se répéter tout les X temps. Très pratique pour une application comme la mienne.</p>
+<p>Il s&rsquo;avère que quand nous lançons un Timer,  celui-ci continue de s&rsquo;exécuter même lorsque notre application se retrouve en background.</p>
+<p>Or, c&rsquo;est à ce moment-là que je me suis posé la question : Que ce passe-t-il pour que notre Timer continuer son exécution malgré que le thread d&rsquo;affichage de notre application soit en pause ?</p>
+<p>Voici le code source de <code>Timer.periodic(...)</code></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-dart" data-lang="dart"><span style="color:#66d9ef">factory</span> Timer.periodic(Duration duration, <span style="color:#66d9ef">void</span> callback(Timer timer)) {
+    <span style="color:#66d9ef">if</span> (Zone.current <span style="color:#f92672">==</span> Zone.root) {
+      <span style="color:#75715e">// No need to bind the callback. We know that the root&#39;s timer will
+</span><span style="color:#75715e"></span>      <span style="color:#75715e">// be invoked in the root zone.
+</span><span style="color:#75715e"></span>      <span style="color:#66d9ef">return</span> Zone.current.createPeriodicTimer(duration, callback);
+    }
+    <span style="color:#66d9ef">var</span> boundCallback <span style="color:#f92672">=</span> Zone.current.bindUnaryCallbackGuarded<span style="color:#f92672">&lt;</span>Timer<span style="color:#f92672">&gt;</span>(callback);
+    <span style="color:#66d9ef">return</span> Zone.current.createPeriodicTimer(duration, boundCallback);
+  }
+</code></pre></div><p>Ok ! Bon ça ne nous dit pas pourquoi cela fonctionne alors que le thread principal est en background ?!
+Pour cela, il faut comprendre le concept de Zone au sein de Dart.</p>
+<h2 id="quest-ce-quune-zone-dans-dart">Qu&rsquo;est-ce qu&rsquo;une Zone dans Dart</h2>
+<p>Une zone dans Dart permet l&rsquo;exécution d&rsquo;un code de façon asynchrone dans le scope du processus qui la lancé. Pour résumer avec le cas du Timer, quand nous lançons un <code>Timer.periodic(...)</code> nous exécutons en fait de manière répétitive la callback qui se comporte comme un Future.</p>
+<p>Or, tout ce qui concerne l&rsquo;asynchronisme dans Dart est exécuté dans le processus principal, a l&rsquo;exception des Isolate qui lance un tout nouveau processus.</p>
+<p>Je vous invite à consulter cette <a href="https://www.didierboelens.com/fr/2019/01/futures-isolates-event-loop/">article</a> pour comprendre le mécanisme</p>
+<h2 id="quelle-implication-aurait-timer-sur-mon-application">Quelle implication aurait Timer sur mon application</h2>
+<p>Malheureusement, pour une bonne application de pomodoro, il faut que celle-ci puisse nous notifier que le temps s&rsquo;écoule et nous prévenir quand celui-ci a fini.</p>
+<p>Or Timer étant exécuté sur le processus principal, et que la VM Dart tourne avec celui de notre application. Si, en tout cas sur Android, nous sortons de l&rsquo;application sans la détruire. Le Timer continuera à s&rsquo;exécuter jusqu&rsquo;à un certain point.
+Ce point, c&rsquo;est le système qui le définit. Sur mon téléphone personnel, il a pris 30min avant d&rsquo;arrêter l&rsquo;exécution de mon application. Si je décidais d&rsquo;activer l&rsquo;option permettant de détruire les activités en background, ce temps est quasi instantané.</p>
+<p>Est-ce une bonne solution d&rsquo;utiliser Timer ? Non dans le cas où avoir une exécution continue, même après mise en background est nécessaire.</p>
+<p>Dans mon cas d&rsquo;application, j&rsquo;ai donc choisi de laisser de côté Timer, pour implémenter un Service Android, pour avoir le comportement souhaité.</p>
+<h2 id="dans-quel-cas-timer-peut-être-utile">Dans quel cas Timer peut-être utile</h2>
+<p>Eh bien, Timer peut-être utile quand vous souhaitez par exemple faire une animation qui se répète, ou que vous souhaitez fetch une donner tous les X temps quand votre application est au premier plan, ou encore d&rsquo;exécuter une fonctionnalité pour montré une évolution/notification sur votre interface, etc.</p>
+<p>À vous de décider.</p>
+
+
+</article>
+
+
+<section class="post-nav">
+    <ul>
+        
+        <li>
+            <a href="https://cedriccreusot.fr/posts/bankaccount-kata-dart/"><i class="fa fa-chevron-circle-left"></i> TDD en Dart</a>
+        </li>
+        
+        
+    </ul>
+</section>
+    
+    
+
+
+
+
+
+</main>
+    <footer>
+        <h6>Copyright © 2019 - Cédric Creusot |
+            Rendered by <a href="https://gohugo.io" title="Hugo">Hugo</a> |
+            <a href="https://cedriccreusot.fr/index.xml">Subscribe </a></h6>
+    </footer>
+</div>
+<script src="/js/scripts.js"></script>
+
+</body>
+
+</html>
+

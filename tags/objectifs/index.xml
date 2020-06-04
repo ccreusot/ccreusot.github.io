@@ -13,31 +13,77 @@
    
    
      <item>
+       <title>Utilisation de Timer avec Flutter</title>
+       <link>https://cedriccreusot.fr/posts/timer-and-flutter/</link>
+       <pubDate>Thu, 04 Jun 2020 14:27:07 +0200</pubDate>
+       
+       <guid>https://cedriccreusot.fr/posts/timer-and-flutter/</guid>
+       <description>&lt;p&gt;Durant le confinement, je souhaitais créer une application de pomodoro toute simple. J&amp;rsquo;ai donc choisi d&amp;rsquo;utiliser Flutter pour ça.
+Étant donné la facilité de faire des prototypes avec Flutter, je me suis dit que ce serait l&amp;rsquo;occasion de pratiquer.&lt;/p&gt;
+&lt;h2 id=&#34;qui-dit-pomodoro-dit-timer&#34;&gt;Qui dit Pomodoro, dit Timer&lt;/h2&gt;
+&lt;p&gt;Avantage de Flutter, c&amp;rsquo;est Dart, il a une panoplie d&amp;rsquo;outils bien utiles pour la réalisation d&amp;rsquo;application.
+J&amp;rsquo;ai donc découvert la classe Timer.&lt;/p&gt;
+&lt;p&gt;La documentation est très légère et ne nous indique pas ce qui se passe sous le capot :&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;A count-down timer that can be configured to fire once or repeatedly.
+
+The timer counts down from the specified duration to 0. When the timer reaches 0, the timer invokes the specified callback function. Use a periodic timer to repeatedly count down the same interval.
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Je me suis principalement servie de &lt;code&gt;Timer.periodic(...)&lt;/code&gt; qui permet comme son nom l&amp;rsquo;indique de créer un timer qui va se répéter tout les X temps. Très pratique pour une application comme la mienne.&lt;/p&gt;
+&lt;p&gt;Il s&amp;rsquo;avère que quand nous lançons un Timer,  celui-ci continue de s&amp;rsquo;exécuter même lorsque notre application se retrouve en background.&lt;/p&gt;
+&lt;p&gt;Or, c&amp;rsquo;est à ce moment-là que je me suis posé la question : Que ce passe-t-il pour que notre Timer continuer son exécution malgré que le thread d&amp;rsquo;affichage de notre application soit en pause ?&lt;/p&gt;
+&lt;p&gt;Voici le code source de &lt;code&gt;Timer.periodic(...)&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-dart&#34; data-lang=&#34;dart&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;factory&lt;/span&gt; Timer.periodic(Duration duration, &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; callback(Timer timer)) {
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; (Zone.current &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; Zone.root) {
+      &lt;span style=&#34;color:#75715e&#34;&gt;// No need to bind the callback. We know that the root&amp;#39;s timer will
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;      &lt;span style=&#34;color:#75715e&#34;&gt;// be invoked in the root zone.
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;      &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; Zone.current.createPeriodicTimer(duration, callback);
+    }
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;var&lt;/span&gt; boundCallback &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; Zone.current.bindUnaryCallbackGuarded&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&lt;/span&gt;Timer&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;(callback);
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; Zone.current.createPeriodicTimer(duration, boundCallback);
+  }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Ok ! Bon ça ne nous dit pas pourquoi cela fonctionne alors que le thread principal est en background ?!
+Pour cela, il faut comprendre le concept de Zone au sein de Dart.&lt;/p&gt;
+&lt;h2 id=&#34;quest-ce-quune-zone-dans-dart&#34;&gt;Qu&amp;rsquo;est-ce qu&amp;rsquo;une Zone dans Dart&lt;/h2&gt;
+&lt;p&gt;Une zone dans Dart permet l&amp;rsquo;exécution d&amp;rsquo;un code de façon asynchrone dans le scope du processus qui la lancé. Pour résumer avec le cas du Timer, quand nous lançons un &lt;code&gt;Timer.periodic(...)&lt;/code&gt; nous exécutons en fait de manière répétitive la callback qui se comporte comme un Future.&lt;/p&gt;
+&lt;p&gt;Or, tout ce qui concerne l&amp;rsquo;asynchronisme dans Dart est exécuté dans le processus principal, a l&amp;rsquo;exception des Isolate qui lance un tout nouveau processus.&lt;/p&gt;
+&lt;p&gt;Je vous invite à consulter cette &lt;a href=&#34;https://www.didierboelens.com/fr/2019/01/futures-isolates-event-loop/&#34;&gt;article&lt;/a&gt; pour comprendre le mécanisme&lt;/p&gt;
+&lt;h2 id=&#34;quelle-implication-aurait-timer-sur-mon-application&#34;&gt;Quelle implication aurait Timer sur mon application&lt;/h2&gt;
+&lt;p&gt;Malheureusement, pour une bonne application de pomodoro, il faut que celle-ci puisse nous notifier que le temps s&amp;rsquo;écoule et nous prévenir quand celui-ci a fini.&lt;/p&gt;
+&lt;p&gt;Or Timer étant exécuté sur le processus principal, et que la VM Dart tourne avec celui de notre application. Si, en tout cas sur Android, nous sortons de l&amp;rsquo;application sans la détruire. Le Timer continuera à s&amp;rsquo;exécuter jusqu&amp;rsquo;à un certain point.
+Ce point, c&amp;rsquo;est le système qui le définit. Sur mon téléphone personnel, il a pris 30min avant d&amp;rsquo;arrêter l&amp;rsquo;exécution de mon application. Si je décidais d&amp;rsquo;activer l&amp;rsquo;option permettant de détruire les activités en background, ce temps est quasi instantané.&lt;/p&gt;
+&lt;p&gt;Est-ce une bonne solution d&amp;rsquo;utiliser Timer ? Non dans le cas où avoir une exécution continue, même après mise en background est nécessaire.&lt;/p&gt;
+&lt;p&gt;Dans mon cas d&amp;rsquo;application, j&amp;rsquo;ai donc choisi de laisser de côté Timer, pour implémenter un Service Android, pour avoir le comportement souhaité.&lt;/p&gt;
+&lt;h2 id=&#34;dans-quel-cas-timer-peut-être-utile&#34;&gt;Dans quel cas Timer peut-être utile&lt;/h2&gt;
+&lt;p&gt;Eh bien, Timer peut-être utile quand vous souhaitez par exemple faire une animation qui se répète, ou que vous souhaitez fetch une donner tous les X temps quand votre application est au premier plan, ou encore d&amp;rsquo;exécuter une fonctionnalité pour montré une évolution/notification sur votre interface, etc.&lt;/p&gt;
+&lt;p&gt;À vous de décider.&lt;/p&gt;
+</description>
+     </item>
+   
+     <item>
        <title>TDD en Dart</title>
        <link>https://cedriccreusot.fr/posts/bankaccount-kata-dart/</link>
        <pubDate>Sun, 22 Mar 2020 11:17:00 +0100</pubDate>
        
        <guid>https://cedriccreusot.fr/posts/bankaccount-kata-dart/</guid>
-       <description>&lt;p&gt;Qu&#39;est-ce que le TDD ? C&#39;est une méthode de développement de logiciel qui pousse l&#39;écriture des tests avant le code du logiciel.&lt;/p&gt;
-&lt;p&gt;L&#39;origine viendrait d&#39;abord du mouvement TFD (Test First Developement), ce qu&#39;apporte le TDD c&#39;est la partie dite de réécriture de code (Refactoring).&lt;/p&gt;
+       <description>&lt;p&gt;Qu&amp;rsquo;est-ce que le TDD ? C&amp;rsquo;est une méthode de développement de logiciel qui pousse l&amp;rsquo;écriture des tests avant le code du logiciel.&lt;/p&gt;
+&lt;p&gt;L&amp;rsquo;origine viendrait d&amp;rsquo;abord du mouvement TFD (Test First Developement), ce qu&amp;rsquo;apporte le TDD c&amp;rsquo;est la partie dite de réécriture de code (Refactoring).&lt;/p&gt;
 &lt;p&gt;La technique est assez simple, et se fait en 3 étapes:&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;On écrit un test qui échoue.&lt;/li&gt;
 &lt;li&gt;On écrit le code correspondant pour valider le test.&lt;/li&gt;
-&lt;li&gt;On vérifie s’il n&#39;y a pas de refactoring possible.&lt;/li&gt;
+&lt;li&gt;On vérifie s’il n&amp;rsquo;y a pas de refactoring possible.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;Les 3 étapes énumérées au-dessus doivent être réalisées en itération.
-C&#39;est-à-dire, vous devez faire ces étapes autant de fois que nécessaires qu&#39;il y a de tests à produire.&lt;/p&gt;
+C&amp;rsquo;est-à-dire, vous devez faire ces étapes autant de fois que nécessaires qu&amp;rsquo;il y a de tests à produire.&lt;/p&gt;
 &lt;figure&gt;
     &lt;img src=&#34;https://cedriccreusot.fr/images/tdd_flow.svg&#34;/&gt; &lt;figcaption&gt;
             &lt;h4&gt;Schéma des 3 étapes du TDD&lt;/h4&gt;
         &lt;/figcaption&gt;
 &lt;/figure&gt;
 
-&lt;p&gt;La théorie est jolie, mais comment s&#39;y prend-on ?&lt;/p&gt;
-&lt;p&gt;Et bien comme l&#39;adage le dit :&lt;/p&gt;
+&lt;p&gt;La théorie est jolie, mais comment s&amp;rsquo;y prend-on ?&lt;/p&gt;
+&lt;p&gt;Et bien comme l&amp;rsquo;adage le dit :&lt;/p&gt;
 &lt;blockquote&gt;
-&lt;p&gt;C&#39;est en forgeant que l&#39;on devient forgeron !&lt;/p&gt;
+&lt;p&gt;C&amp;rsquo;est en forgeant que l&amp;rsquo;on devient forgeron !&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;p&gt;Nous allons donc mettre ces règles en pratique ! Comment ? En utilisant un Kata ! Comme dans les arts martiaux, nous allons nous entrainer !&lt;/p&gt;
 &lt;figure&gt;
@@ -46,13 +92,13 @@ C&#39;est-à-dire, vous devez faire ces étapes autant de fois que nécessaires 
 
 &lt;p&gt;Illustrons cela par un cas assez complexe : &lt;a href=&#34;https://kata-log.rocks/banking-kata&#34;&gt;&lt;strong&gt;BankAccount&lt;/strong&gt;&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;Nous nous exercerons avec Dart.&lt;/p&gt;
-&lt;p&gt;Que nous dit l&#39;énoncé ?
-Il faut écrire une classe &lt;code&gt;Account&lt;/code&gt; qui doit offrir 3 fonctionnalités déposées de l&#39;argent, retirer de l&#39;argent et enfin retourner une description des opérations.&lt;/p&gt;
+&lt;p&gt;Que nous dit l&amp;rsquo;énoncé ?
+Il faut écrire une classe &lt;code&gt;Account&lt;/code&gt; qui doit offrir 3 fonctionnalités déposées de l&amp;rsquo;argent, retirer de l&amp;rsquo;argent et enfin retourner une description des opérations.&lt;/p&gt;
 &lt;p&gt;Exemple :&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;Date        Amount  Balance
 24.12.2015   +500      500
 23.8.2016    -100      400
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Dans un premier temps, si vous n&#39;avez pas installé Dart suivez les instructions &lt;a href=&#34;https://dart.dev/get-dart&#34;&gt;&lt;strong&gt;ici&lt;/strong&gt;&lt;/a&gt;,
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Dans un premier temps, si vous n&amp;rsquo;avez pas installé Dart suivez les instructions &lt;a href=&#34;https://dart.dev/get-dart&#34;&gt;&lt;strong&gt;ici&lt;/strong&gt;&lt;/a&gt;,
 puis créez-vous un nouveau projet en mode &lt;a href=&#34;https://dart.dev/tutorials/server/get-started&#34;&gt;&lt;strong&gt;console&lt;/strong&gt;&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;Vous devriez avoir votre projet sous cette forme :&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;bankaccount --&amp;gt; bin/main.dart
@@ -68,10 +114,10 @@ puis créez-vous un nouveau projet en mode &lt;a href=&#34;https://dart.dev/tuto
             |-&amp;gt; .dart_tool
 &lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;fonction-depositint&#34;&gt;Fonction &lt;code&gt;deposit(int)&lt;/code&gt;&lt;/h2&gt;
 &lt;h3 id=&#34;écrire-son-premier-test&#34;&gt;Écrire son premier test&lt;/h3&gt;
-&lt;p&gt;Nous avons un biais, qui est de vouloir écrire directement ce que l&#39;on nous demande.&lt;/p&gt;
+&lt;p&gt;Nous avons un biais, qui est de vouloir écrire directement ce que l&amp;rsquo;on nous demande.&lt;/p&gt;
 &lt;p&gt;Alors que faut-il faire en TDD pour écrire son premier test ?&lt;/p&gt;
 &lt;p&gt;Mon premier conseil est de commencer par ce qui ne correspond pas au scope.&lt;/p&gt;
-&lt;p&gt;Prenons la première méthode qui est de déposer de l&#39;argent. Si l&#39;on réfléchit à ce que doit faire cette méthode, elle doit permettre de déposer une somme d&#39;argent positive et jamais négative.&lt;/p&gt;
+&lt;p&gt;Prenons la première méthode qui est de déposer de l&amp;rsquo;argent. Si l&amp;rsquo;on réfléchit à ce que doit faire cette méthode, elle doit permettre de déposer une somme d&amp;rsquo;argent positive et jamais négative.&lt;/p&gt;
 &lt;p&gt;Notre premier test devrait ressembler à ceci :&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;import &#39;package:bankaccount/bankaccount.dart&#39;;
 import &#39;package:test/test.dart&#39;;
@@ -87,15 +133,15 @@ void main() {
         &amp;quot;You can&#39;t deposit negative value&amp;quot;)));
   });
 }
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Nous nous assurons que la somme déposée ne sera jamais négative. Donc quand on fait un dépôt d&#39;argent négatif, notre class Account doit émettre une erreur, même si cela n&#39;est clairement pas demander dans notre énoncé nous devons prévoir les cas d&#39;erreur.&lt;/p&gt;
-&lt;p&gt;Notre premier test est écrit à l&#39;exécution de celui-ci nous allons fatalement avoir un message d&#39;erreur, or c&#39;est ce que l&#39;on souhaite.
-Le message d&#39;erreur va nous indiquer que la fonction n&#39;existe pas.&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Nous nous assurons que la somme déposée ne sera jamais négative. Donc quand on fait un dépôt d&amp;rsquo;argent négatif, notre class Account doit émettre une erreur, même si cela n&amp;rsquo;est clairement pas demander dans notre énoncé nous devons prévoir les cas d&amp;rsquo;erreur.&lt;/p&gt;
+&lt;p&gt;Notre premier test est écrit à l&amp;rsquo;exécution de celui-ci nous allons fatalement avoir un message d&amp;rsquo;erreur, or c&amp;rsquo;est ce que l&amp;rsquo;on souhaite.
+Le message d&amp;rsquo;erreur va nous indiquer que la fonction n&amp;rsquo;existe pas.&lt;/p&gt;
 &lt;p&gt;Ajoutons, la méthode &lt;code&gt;deposit(int)&lt;/code&gt; à notre Account:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;class Account {
   void deposit(int value) {
   }
 }
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Sans l&#39;implémenter, nous allons exécuter notre test :&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Sans l&amp;rsquo;implémenter, nous allons exécuter notre test :&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;pub run test
 00:01 +0 -1: test\bankaccount_test.dart: deposit negative number should throw an invalid argument exception [E]
   Expected: throws &amp;lt;Instance of &#39;ArgumentError&#39;&amp;gt; with `message`: &#39;You can\&#39;t deposit negative value&#39;
@@ -107,7 +153,7 @@ Le message d&#39;erreur va nous indiquer que la fonction n&#39;existe pas.&lt;/p
 
 00:01 +0 -1: Some tests failed.
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Très bien, le moteur de test nous indique que la méthode ne fait pas ce qui est attendu.
-Il nous suffit ensuite d&#39;ajouter ce qu&#39;il manque à celle-ci :&lt;/p&gt;
+Il nous suffit ensuite d&amp;rsquo;ajouter ce qu&amp;rsquo;il manque à celle-ci :&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;class Account {
   void deposit(int value) {
     throw ArgumentError(&amp;quot;You can&#39;t deposit negative value&amp;quot;);
@@ -118,7 +164,7 @@ Il nous suffit ensuite d&#39;ajouter ce qu&#39;il manque à celle-ci :&lt;/p&gt;
 00:01 +1: All tests passed!
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Premier test réussi ! Améliorons ça avec le 2nd.&lt;/p&gt;
 &lt;h3 id=&#34;second-test&#34;&gt;Second test&lt;/h3&gt;
-&lt;p&gt;Le second test ici sera encore un cas d&#39;exception. Il nous faut couvrir le cas : chercher à ne déposer aucune somme (ou en tout cas 0).&lt;/p&gt;
+&lt;p&gt;Le second test ici sera encore un cas d&amp;rsquo;exception. Il nous faut couvrir le cas : chercher à ne déposer aucune somme (ou en tout cas 0).&lt;/p&gt;
 &lt;p&gt;Ajoutons notre nouveau test à notre fichier :&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;  test(&#39;deposit 0 should throw an invalid argument exception&#39;, () {
     Account account = Account();
@@ -151,8 +197,8 @@ different.
   test\bankaccount_test.dart 20:5  main.&amp;lt;fn&amp;gt;
 
 00:01 +1 -1: Some tests failed.
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Le premier test continue de fonctionnaire or le second, ne passe pas non plus. Il y a ici une petite subtilité, nous avons changé le message d&#39;erreur attendue.&lt;/p&gt;
-&lt;p&gt;Donc pour résoudre ce problème, il suffirait de rajouter ce message d&#39;erreur dans notre classe &lt;code&gt;Account&lt;/code&gt; :&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Le premier test continue de fonctionnaire or le second, ne passe pas non plus. Il y a ici une petite subtilité, nous avons changé le message d&amp;rsquo;erreur attendue.&lt;/p&gt;
+&lt;p&gt;Donc pour résoudre ce problème, il suffirait de rajouter ce message d&amp;rsquo;erreur dans notre classe &lt;code&gt;Account&lt;/code&gt; :&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;class Account {
   void deposit(int value) {
     if (value == 0) {
@@ -166,15 +212,15 @@ different.
 00:01 +2: All tests passed!
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Nous avons un message nous indiquant que les 2 tests passent.&lt;/p&gt;
 &lt;h3 id=&#34;troisième--quatrième-test&#34;&gt;Troisième &amp;amp; Quatrième test&lt;/h3&gt;
-&lt;p&gt;Prenons un instant pour comprendre l&#39;intérêt d&#39;avoir fait les 2 premiers tests avant d&#39;entamer le 3ème test.&lt;/p&gt;
-&lt;p&gt;Pourquoi avoir fait ces 2 tests alors qu&#39;il aurait bien pu suffire de se concentrer que sur le périmètre fonctionnel ?&lt;/p&gt;
+&lt;p&gt;Prenons un instant pour comprendre l&amp;rsquo;intérêt d&amp;rsquo;avoir fait les 2 premiers tests avant d&amp;rsquo;entamer le 3ème test.&lt;/p&gt;
+&lt;p&gt;Pourquoi avoir fait ces 2 tests alors qu&amp;rsquo;il aurait bien pu suffire de se concentrer que sur le périmètre fonctionnel ?&lt;/p&gt;
 &lt;p&gt;Prenons le schéma suivant :&lt;/p&gt;
 &lt;p&gt;[Mettre le schéma]&lt;/p&gt;
-&lt;p&gt;L&#39;intérêt de faire 2 tests farfelus était pour prévoir des cas d&#39;erreurs, pouvant intervenir lorsque l&#39;utilisateur de notre
-classe n&#39;utilise pas celle-ci dans le petit périmètre défini.&lt;/p&gt;
-&lt;p&gt;À chaque périmètre d&#39;erreur géré, on rend donc notre logiciel plus robuste.&lt;/p&gt;
-&lt;p&gt;Le dernier test est donc le test fonctionnel, l&#39;attendue que l&#39;on nous demande depuis le début. Ici pour la méthode &lt;code&gt;deposit()&lt;/code&gt; ce sera
-ajouter une somme d&#39;argent au compte.&lt;/p&gt;
+&lt;p&gt;L&amp;rsquo;intérêt de faire 2 tests farfelus était pour prévoir des cas d&amp;rsquo;erreurs, pouvant intervenir lorsque l&amp;rsquo;utilisateur de notre
+classe n&amp;rsquo;utilise pas celle-ci dans le petit périmètre défini.&lt;/p&gt;
+&lt;p&gt;À chaque périmètre d&amp;rsquo;erreur géré, on rend donc notre logiciel plus robuste.&lt;/p&gt;
+&lt;p&gt;Le dernier test est donc le test fonctionnel, l&amp;rsquo;attendue que l&amp;rsquo;on nous demande depuis le début. Ici pour la méthode &lt;code&gt;deposit()&lt;/code&gt; ce sera
+ajouter une somme d&amp;rsquo;argent au compte.&lt;/p&gt;
 &lt;p&gt;Notre &amp;ldquo;dernier&amp;rdquo; test.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;  test(&#39;deposit positive value should return new Account with positive balance&#39;, () {
     Account account = Account();
@@ -184,7 +230,7 @@ ajouter une somme d&#39;argent au compte.&lt;/p&gt;
     expect(newAccount.balance(), 1);
   });
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Remarqués, ici nous ne cherchons pas à tester le retour du print statement, nous le verrons bien plus tard.
-Ici pour vérifier que l&#39;on ajoute bien de l&#39;argent à notre compte, nous utilisons pour l&#39;instant une fonction qui calcule la balance de celui-ci.&lt;/p&gt;
+Ici pour vérifier que l&amp;rsquo;on ajoute bien de l&amp;rsquo;argent à notre compte, nous utilisons pour l&amp;rsquo;instant une fonction qui calcule la balance de celui-ci.&lt;/p&gt;
 &lt;p&gt;Nous obtenons donc :&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;class Account {
   Account deposit(int value) {
@@ -201,7 +247,7 @@ Ici pour vérifier que l&#39;on ajoute bien de l&#39;argent à notre compte, nou
     return 1;
   }
 }
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Eh oui, ici, j&#39;ai décidé de tricher. Comment donc m&#39;assurer que j&#39;ai bien ajouter le l&#39;argent ? Avec un 4ème test&amp;hellip;&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Eh oui, ici, j&amp;rsquo;ai décidé de tricher. Comment donc m&amp;rsquo;assurer que j&amp;rsquo;ai bien ajouter le l&amp;rsquo;argent ? Avec un 4ème test&amp;hellip;&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;  test(&#39;deposit 10 then 100 should return new Account with 110 for balance&#39;, () {
     Account account = Account();
 
@@ -226,10 +272,10 @@ Ici pour vérifier que l&#39;on ajoute bien de l&#39;argent à notre compte, nou
     return Account(balance: balance + value);
   }
 }
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Nous avons une classe Account qui nous permet de déposer de l&#39;argent ! Et qui nous fournis la balance courante.&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Nous avons une classe Account qui nous permet de déposer de l&amp;rsquo;argent ! Et qui nous fournis la balance courante.&lt;/p&gt;
 &lt;h2 id=&#34;fonction-withdrawint&#34;&gt;Fonction &lt;code&gt;withdraw(int)&lt;/code&gt;&lt;/h2&gt;
-&lt;p&gt;Même opération pour le withdraw, à l&#39;exception que l&#39;on n’aura pas besoin d&#39;écrire 4 cas de test. Ici on en écrira que 3. Je vous laisse expérimenter par vous-même. ;-)&lt;/p&gt;
-&lt;p&gt;Garder en tête que vous devez toujours tester l&#39;inconnue qui est en dehors de votre scope.&lt;/p&gt;
+&lt;p&gt;Même opération pour le withdraw, à l&amp;rsquo;exception que l&amp;rsquo;on n’aura pas besoin d&amp;rsquo;écrire 4 cas de test. Ici on en écrira que 3. Je vous laisse expérimenter par vous-même. ;-)&lt;/p&gt;
+&lt;p&gt;Garder en tête que vous devez toujours tester l&amp;rsquo;inconnue qui est en dehors de votre scope.&lt;/p&gt;
 &lt;figure&gt;
     &lt;img src=&#34;https://cedriccreusot.fr/images/tdd_scope.svg&#34;/&gt; &lt;figcaption&gt;
             &lt;h4&gt;Schéma de différent scopes en TDD&lt;/h4&gt;
@@ -239,20 +285,20 @@ Ici pour vérifier que l&#39;on ajoute bien de l&#39;argent à notre compte, nou
 &lt;p&gt;Remarques :&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;
-&lt;p&gt;Vous aurez remarqué que j&#39;ai fait le choix de renvoyer un nouveau Account à chaque ajout. Faite de même pour le retrait. C&#39;est un choix personnel, un petit défi supplémentaire que j&#39;ai choisi de m&#39;imposer.&lt;/p&gt;
+&lt;p&gt;Vous aurez remarqué que j&amp;rsquo;ai fait le choix de renvoyer un nouveau Account à chaque ajout. Faite de même pour le retrait. C&amp;rsquo;est un choix personnel, un petit défi supplémentaire que j&amp;rsquo;ai choisi de m&amp;rsquo;imposer.&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;Ici nous passons souvent par une phase Écriture du Test -&amp;gt; Exécution du dit Test -&amp;gt; Validation de Échec -&amp;gt; Écriture de la solution -&amp;gt; réexécution du Test -&amp;gt; Validation du passage du Test.
-Or il nous manque souvent cette phase de réfactorisation. Celle-ci peut s&#39;appliquer sur les Tests comme sur le code implémenté.&lt;/p&gt;
+Or il nous manque souvent cette phase de réfactorisation. Celle-ci peut s&amp;rsquo;appliquer sur les Tests comme sur le code implémenté.&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Nous respectons pas pour l&#39;instant ce schéma : &lt;figure&gt;
+&lt;p&gt;Nous respectons pas pour l&amp;rsquo;instant ce schéma : &lt;figure&gt;
     &lt;img src=&#34;https://cedriccreusot.fr/images/tdd_flow.svg&#34;/&gt; 
 &lt;/figure&gt;
 &lt;/p&gt;
-&lt;p&gt;Passons à l&#39;étape du &lt;code&gt;printStatement()&lt;/code&gt; qui doit nous retourner une chaine de caractère. Nous verrons le refactoring, mais un peu plus tard, c&#39;est souvent une appréciation personnelle.&lt;/p&gt;
+&lt;p&gt;Passons à l&amp;rsquo;étape du &lt;code&gt;printStatement()&lt;/code&gt; qui doit nous retourner une chaine de caractère. Nous verrons le refactoring, mais un peu plus tard, c&amp;rsquo;est souvent une appréciation personnelle.&lt;/p&gt;
 &lt;h2 id=&#34;fonction-string-printstatement&#34;&gt;Fonction &lt;code&gt;String printStatement()&lt;/code&gt;&lt;/h2&gt;
-&lt;p&gt;Pour illustrer que l&#39;on ne pense pas à tout, je vais me baser sur la première idée que j&#39;aurais pour faire un test pour cette méthode.&lt;/p&gt;
+&lt;p&gt;Pour illustrer que l&amp;rsquo;on ne pense pas à tout, je vais me baser sur la première idée que j&amp;rsquo;aurais pour faire un test pour cette méthode.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;    test(&#39;printStatement after a deposit should show the date of the deposit and the value given and the current balance&#39;,
       () {
     var account = Account();
@@ -267,11 +313,11 @@ Or il nous manque souvent cette phase de réfactorisation. Celle-ci peut s&#39;a
     &#39;&#39;&#39;);
 
   });
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Mon code de &lt;code&gt;printStatement()&lt;/code&gt; pour l&#39;instant ressemble à ça :&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Mon code de &lt;code&gt;printStatement()&lt;/code&gt; pour l&amp;rsquo;instant ressemble à ça :&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;  String printStatement() {
     return null;
   }
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Cela ne vous surprendra donc pas que ce test va échouer. Pour résoudre l&#39;erreur, il suffit donc d&#39;implémenter la méthode :&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Cela ne vous surprendra donc pas que ce test va échouer. Pour résoudre l&amp;rsquo;erreur, il suffit donc d&amp;rsquo;implémenter la méthode :&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;  String printStatement() {
     var currentDate = DateTime.now();
     return &#39;&#39;&#39;
@@ -279,8 +325,8 @@ Or il nous manque souvent cette phase de réfactorisation. Celle-ci peut s&#39;a
     ${currentDate.day}.${currentDate.month}.${currentDate.year}\t\t\t\t$balance\t\t\t\t$balance
     &#39;&#39;&#39;;
   }
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Ce test me tracasse, il semblerait que j&#39;ai souhaité allez un peu trop vite.
-Le premier test que j&#39;aurais dû appliquer est celui-ci :&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Ce test me tracasse, il semblerait que j&amp;rsquo;ai souhaité allez un peu trop vite.
+Le premier test que j&amp;rsquo;aurais dû appliquer est celui-ci :&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;  test(&#39;printStatement without statement deposit&#39;, () {
     var account = Account();
 
@@ -291,10 +337,10 @@ Le premier test que j&#39;aurais dû appliquer est celui-ci :&lt;/p&gt;
         \t\t\t\t      \t\t\t\t0
     &#39;&#39;&#39;);
   });
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;En effet, si je possède un tout nouveau compte, il est normal de n&#39;avoir aucune opération et une balance de 0. Ce choix est arbitraire.
-J&#39;aurais très bien pu me concentrer sur le retour de la première ligne.&lt;/p&gt;
-&lt;p&gt;Remarque en rajoutant ce test, je me suis rendue à l&#39;évidence qu&#39;il serait préférable de parler de ces opérations.
-J&#39;ai donc choisi de refactorer la classe &lt;code&gt;Account&lt;/code&gt; de cette façon :&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;En effet, si je possède un tout nouveau compte, il est normal de n&amp;rsquo;avoir aucune opération et une balance de 0. Ce choix est arbitraire.
+J&amp;rsquo;aurais très bien pu me concentrer sur le retour de la première ligne.&lt;/p&gt;
+&lt;p&gt;Remarque en rajoutant ce test, je me suis rendue à l&amp;rsquo;évidence qu&amp;rsquo;il serait préférable de parler de ces opérations.
+J&amp;rsquo;ai donc choisi de refactorer la classe &lt;code&gt;Account&lt;/code&gt; de cette façon :&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;class Account {
   final List&amp;lt;Transaction&amp;gt; transactions;
 
@@ -341,7 +387,7 @@ J&#39;ai donc choisi de refactorer la classe &lt;code&gt;Account&lt;/code&gt; de
     &#39;&#39;&#39;;
   }
 }
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;J&#39;ai choisi de matérialiser les transactions, et je garde toujours ma propriété qui me permet de calculer la balance.
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;J&amp;rsquo;ai choisi de matérialiser les transactions, et je garde toujours ma propriété qui me permet de calculer la balance.
 La classe &lt;code&gt;Transaction&lt;/code&gt; :&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;class Transaction {
   final DateTime date = DateTime.now();
@@ -351,7 +397,7 @@ La classe &lt;code&gt;Transaction&lt;/code&gt; :&lt;/p&gt;
 }
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Passons à la suite.&lt;/p&gt;
 &lt;h3 id=&#34;le-dernier-test&#34;&gt;Le dernier test&lt;/h3&gt;
-&lt;p&gt;J&#39;opte pour l&#39;utilisation de plusieurs opérations pour vérifier si mon algorithme pour le &lt;code&gt;String printStatement()&lt;/code&gt; va fonctionner.&lt;/p&gt;
+&lt;p&gt;J&amp;rsquo;opte pour l&amp;rsquo;utilisation de plusieurs opérations pour vérifier si mon algorithme pour le &lt;code&gt;String printStatement()&lt;/code&gt; va fonctionner.&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;    test(
       &#39;printStatement after a deposit and withdraw should show the date of the deposits and the values given and the current balance for each operations&#39;,
       () {
@@ -386,7 +432,7 @@ La classe &lt;code&gt;Transaction&lt;/code&gt; :&lt;/p&gt;
     Date\t\t\t\tAmount\t\t\t\tBalance${transactionStatements.fold(&amp;quot;&amp;quot;, (previous, current) =&amp;gt; previous + &amp;quot;\n    &amp;quot; + current)}
     &#39;&#39;&#39;;
   }
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Les tests passes tous, mais je considère que le code dans l&#39;ensemble peut-être amélioré.&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Les tests passes tous, mais je considère que le code dans l&amp;rsquo;ensemble peut-être amélioré.&lt;/p&gt;
 &lt;h3 id=&#34;refactoring&#34;&gt;Refactoring&lt;/h3&gt;
 &lt;p&gt;Que peut-on améliorer ? Sur le dernier test nous nous basons que sur la date en cours. Or, l&#39;&lt;code&gt;Account&lt;/code&gt; peut être créée et vivre très longtemps dans le temps, il faut pouvoir le modéliser. Comment y procéder ?&lt;/p&gt;
 &lt;p&gt;Je dirais en créant une interface qui permet de délivrer la date du jour.
@@ -443,8 +489,8 @@ En Dart nous n’avons pas la possibilité de faire des interfaces alors nous pa
     &#39;&#39;&#39;;
   }
 }
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Très bien notre classe a évolué, mais que pouvons-nous faire pour les tests ? Parce que a vue d&#39;oeil cela ne change pas grand-chose.
-Et bien l&#39;avantage d&#39;utiliser maintenant une classe abstraite &lt;code&gt;DateProvider&lt;/code&gt; nous pouvons facilement la mocker dans les tests&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Très bien notre classe a évolué, mais que pouvons-nous faire pour les tests ? Parce que a vue d&amp;rsquo;oeil cela ne change pas grand-chose.
+Et bien l&amp;rsquo;avantage d&amp;rsquo;utiliser maintenant une classe abstraite &lt;code&gt;DateProvider&lt;/code&gt; nous pouvons facilement la mocker dans les tests&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;class MockDateProvider extends Mock implements DateProvider {}
 
 test(
@@ -467,7 +513,7 @@ test(
   });
 &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Comme vous pouvez le voir, nous avons un meilleur contrôle sur la date, donc nous pouvons faire voyager dans le temps nos transactions.&lt;/p&gt;
 &lt;p&gt;Nous avons donc réglé ce problème de temps. Il reste un dernier point. Il y a plusieurs tests qui dans leurs finalités ne servent plus à rien.&lt;/p&gt;
-&lt;p&gt;L&#39;utilisation de la balance n&#39;a plus vraiment d&#39;intérêt. C&#39;est pour ça que nous allons nous en séparer et de même pour les tests qui l&#39;utilisent.&lt;/p&gt;
+&lt;p&gt;L&amp;rsquo;utilisation de la balance n&amp;rsquo;a plus vraiment d&amp;rsquo;intérêt. C&amp;rsquo;est pour ça que nous allons nous en séparer et de même pour les tests qui l&amp;rsquo;utilisent.&lt;/p&gt;
 &lt;p&gt;Ce qui donne ce refactoring final pour la classe &lt;code&gt;Account&lt;/code&gt; :&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;class Account {
   final List&amp;lt;Transaction&amp;gt; transactions;
@@ -586,7 +632,7 @@ void main() {
     &#39;&#39;&#39;);
   });
 }
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Mot de la fin, il y a bien entendu pas qu&#39;une façon de faire ce genre d&#39;exercice. L&#39;idée ici était de vous entrainez à la méthode TDD en vous faisant parcourir avec moi, un exercice tel que le BankAccount.&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;Mot de la fin, il y a bien entendu pas qu&amp;rsquo;une façon de faire ce genre d&amp;rsquo;exercice. L&amp;rsquo;idée ici était de vous entrainez à la méthode TDD en vous faisant parcourir avec moi, un exercice tel que le BankAccount.&lt;/p&gt;
 &lt;p&gt;Retenez ce schéma :&lt;/p&gt;
 &lt;figure&gt;
     &lt;img src=&#34;https://cedriccreusot.fr/images/tdd_flow.svg&#34;/&gt; &lt;figcaption&gt;
@@ -594,7 +640,7 @@ void main() {
         &lt;/figcaption&gt;
 &lt;/figure&gt;
 
-&lt;p&gt;Essayez-vous aux autres exercices pour vous entrainer ! Variez les langages et technologies utilisées. Ils sont utiles lors d&#39;apprentissage d&#39;un nouveau langage. Donc, entrainez-vous ! Seule ou à plusieurs ;-)&lt;/p&gt;
+&lt;p&gt;Essayez-vous aux autres exercices pour vous entrainer ! Variez les langages et technologies utilisées. Ils sont utiles lors d&amp;rsquo;apprentissage d&amp;rsquo;un nouveau langage. Donc, entrainez-vous ! Seule ou à plusieurs ;-)&lt;/p&gt;
 &lt;figure&gt;
     &lt;img src=&#34;https://media.giphy.com/media/xUA7aT2aKuDQqZLcOs/giphy.gif&#34;/&gt; 
 &lt;/figure&gt;
@@ -612,34 +658,34 @@ void main() {
        <guid>https://cedriccreusot.fr/posts/flutter-bootcamp/</guid>
        <description>&lt;p&gt;Cet article va être dédié au Bootcamp Flutter vendu par The App Brewery sur leur site (que vous pouvez aussi retrouver sur Udemy).
 Il fut annoncé à la suite de la Google I/O 2019. Ayant déjà réalisé le codelabs de Google sur Flutter qui nous apprenait les base.
-Je me suis dit que c&#39;était une bonne idée de faire ce Bootcamp pour me former et gagner en expérience avec cette technologie.&lt;/p&gt;
+Je me suis dit que c&amp;rsquo;était une bonne idée de faire ce Bootcamp pour me former et gagner en expérience avec cette technologie.&lt;/p&gt;
 &lt;h2 id=&#34;accessibilité&#34;&gt;Accessibilité&lt;/h2&gt;
-&lt;p&gt;Ce Bootcamp est accessible au plus grand nombre, il n&#39;y a pas besoin de connaitre déjà Flutter pour s&#39;en sortir. Il n&#39;y a pas non plus besoin de connaitre Dart, ou de savoir programmer.&lt;/p&gt;
+&lt;p&gt;Ce Bootcamp est accessible au plus grand nombre, il n&amp;rsquo;y a pas besoin de connaitre déjà Flutter pour s&amp;rsquo;en sortir. Il n&amp;rsquo;y a pas non plus besoin de connaitre Dart, ou de savoir programmer.&lt;/p&gt;
 &lt;p&gt;Il vous prend par la main pour débuter.&lt;/p&gt;
-&lt;p&gt;Si vous savez déjà coder, vous n&#39;apprendrez pas via celui-ci plus de choses que vous connaissiez déjà côté programmation.&lt;/p&gt;
-&lt;p&gt;Ne pensez pas non plus y trouver un moyen d&#39;apprendre Dart. Ce Bootcamp se contente de vous montrer les bases, pour vous en sortir avec Flutter.&lt;/p&gt;
-&lt;p&gt;The App Brewery a fait un travail remarquable sur l&#39;accompagnement du débutant, les vidéos vont vous montrer souvent les réponses dont vous avez besoin pour réaliser les différents exercices.&lt;/p&gt;
+&lt;p&gt;Si vous savez déjà coder, vous n&amp;rsquo;apprendrez pas via celui-ci plus de choses que vous connaissiez déjà côté programmation.&lt;/p&gt;
+&lt;p&gt;Ne pensez pas non plus y trouver un moyen d&amp;rsquo;apprendre Dart. Ce Bootcamp se contente de vous montrer les bases, pour vous en sortir avec Flutter.&lt;/p&gt;
+&lt;p&gt;The App Brewery a fait un travail remarquable sur l&amp;rsquo;accompagnement du débutant, les vidéos vont vous montrer souvent les réponses dont vous avez besoin pour réaliser les différents exercices.&lt;/p&gt;
 &lt;h2 id=&#34;le-bon&#34;&gt;Le bon&lt;/h2&gt;
-&lt;p&gt;Tout abord, cette formation est en Anglais, il faut donc connaitre la langue de Shakespear pour pouvoir s&#39;en sortir (et ça vous aideras à pratiquer).&lt;/p&gt;
-&lt;p&gt;La personne nous accompagnant en vidéo durant ce Bootcamp a l&#39;avantage d&#39;avoir une diction claire, qui vous permet d&#39;accélérer la vidéo, ce qui vous force à vous concentrer sur ce qui est dit et montré, et si vous n&#39;avez pas bien compris, il suffit de faire un retour arrière pour revoir la partie en question quitte à ralentir le rythme.&lt;/p&gt;
+&lt;p&gt;Tout abord, cette formation est en Anglais, il faut donc connaitre la langue de Shakespear pour pouvoir s&amp;rsquo;en sortir (et ça vous aideras à pratiquer).&lt;/p&gt;
+&lt;p&gt;La personne nous accompagnant en vidéo durant ce Bootcamp a l&amp;rsquo;avantage d&amp;rsquo;avoir une diction claire, qui vous permet d&amp;rsquo;accélérer la vidéo, ce qui vous force à vous concentrer sur ce qui est dit et montré, et si vous n&amp;rsquo;avez pas bien compris, il suffit de faire un retour arrière pour revoir la partie en question quitte à ralentir le rythme.&lt;/p&gt;
 &lt;p&gt;Pour ce qui est du contenu, on vous apprend à programmer des choses simples en Dart ce qui est un bon plus pour ceux qui débutent.&lt;/p&gt;
-&lt;p&gt;Il y a 16 sections avec selon la section des challenges. Chaque section vous apprend un concept de programmation et à l&#39;utiliser dans les challenges. Les sources des projets seront accessibles via le github de The App Brewery vous trouverez souvent un lien a ceux-ci dans la section correspondante.&lt;/p&gt;
-&lt;p&gt;Faite vraiment pause durant ses challenges, pour voir des concepts et apprendre à chercher les bons outils seuls c&#39;est vraiment un très bon exercice, prenez aussi le temps pour comprendre votre solution avant de passer à la solution proposer par The App Brewery, vous serez surpris d&#39;arriver à faire ce qu&#39;il vous demande, mais d&#39;une autre manière.&lt;/p&gt;
+&lt;p&gt;Il y a 16 sections avec selon la section des challenges. Chaque section vous apprend un concept de programmation et à l&amp;rsquo;utiliser dans les challenges. Les sources des projets seront accessibles via le github de The App Brewery vous trouverez souvent un lien a ceux-ci dans la section correspondante.&lt;/p&gt;
+&lt;p&gt;Faite vraiment pause durant ses challenges, pour voir des concepts et apprendre à chercher les bons outils seuls c&amp;rsquo;est vraiment un très bon exercice, prenez aussi le temps pour comprendre votre solution avant de passer à la solution proposer par The App Brewery, vous serez surpris d&amp;rsquo;arriver à faire ce qu&amp;rsquo;il vous demande, mais d&amp;rsquo;une autre manière.&lt;/p&gt;
 &lt;p&gt;La communauté est active, vous pourrez leur poser des questions quand vous êtes bloqué sur un sujet.&lt;/p&gt;
-&lt;h2 id=&#34;ce-quil-manque&#34;&gt;Ce qu&#39;il manque&lt;/h2&gt;
+&lt;h2 id=&#34;ce-quil-manque&#34;&gt;Ce qu&amp;rsquo;il manque&lt;/h2&gt;
 &lt;p&gt;Cette formation a du bon, mais il manque, je pense, quelques parties essentielles :&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;La théorie de programmation, il ne faut pas faire impasse dessus même s’il est facile de faire du développement en Dart, cela reste un langage-objet.&lt;/li&gt;
-&lt;li&gt;Pas de tests, pour pouvoir considérer que l&#39;on est complètement opérationnel en Flutter et en Dart par transitivité, il ne faut pas les négligés. Une partie, dédier au test serait intéressant et apporterait un plus très qualitatif. Flutter et Dart offre de base tous les outils pour faire des tests.&lt;/li&gt;
-&lt;li&gt;Manque d&#39;une section, CI/CD, pas obligatoire, mais peut-être très intéressant de connaitre au moins quelque informations dessus.&lt;/li&gt;
-&lt;li&gt;Il n&#39;y a que quelques StateManagement de présentés, on vous apprend à vous servir du système de &lt;code&gt;setState({})&lt;/code&gt; et aussi de Provider.&lt;/li&gt;
-&lt;li&gt;Provider est une bonne librairie pour débuter, mais il faut vraiment faire attention avec elle (je vous laisse le lien vers &lt;a href=&#34;https://www.didierboelens.com/fr/2019/07/provider---points-dint%C3%A9r%C3%AAt---points-dattention&#34;&gt;l&#39;article de Didier Boelens sur le sujet de Provider.&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Attention ! Cette Formation n&#39;est pas à jour par rapport au changement apportée dans le langage Dart et les dernières versions de Flutter.&lt;/li&gt;
-&lt;li&gt;Certain exemple montré en Dart qui ne sont pas recommandés dans la documentation officielle du langage exemple l&#39;utilisation du &lt;a href=&#34;https://dart.dev/guides/language/effective-dart/style#dont-use-prefix-letters&#34;&gt;&amp;ldquo;k&amp;rdquo; pour préfix d&#39;une variable&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Pas de tests, pour pouvoir considérer que l&amp;rsquo;on est complètement opérationnel en Flutter et en Dart par transitivité, il ne faut pas les négligés. Une partie, dédier au test serait intéressant et apporterait un plus très qualitatif. Flutter et Dart offre de base tous les outils pour faire des tests.&lt;/li&gt;
+&lt;li&gt;Manque d&amp;rsquo;une section, CI/CD, pas obligatoire, mais peut-être très intéressant de connaitre au moins quelque informations dessus.&lt;/li&gt;
+&lt;li&gt;Il n&amp;rsquo;y a que quelques StateManagement de présentés, on vous apprend à vous servir du système de &lt;code&gt;setState({})&lt;/code&gt; et aussi de Provider.&lt;/li&gt;
+&lt;li&gt;Provider est une bonne librairie pour débuter, mais il faut vraiment faire attention avec elle (je vous laisse le lien vers &lt;a href=&#34;https://www.didierboelens.com/fr/2019/07/provider---points-dint%C3%A9r%C3%AAt---points-dattention&#34;&gt;l&amp;rsquo;article de Didier Boelens sur le sujet de Provider.&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Attention ! Cette Formation n&amp;rsquo;est pas à jour par rapport au changement apportée dans le langage Dart et les dernières versions de Flutter.&lt;/li&gt;
+&lt;li&gt;Certain exemple montré en Dart qui ne sont pas recommandés dans la documentation officielle du langage exemple l&amp;rsquo;utilisation du &lt;a href=&#34;https://dart.dev/guides/language/effective-dart/style#dont-use-prefix-letters&#34;&gt;&amp;ldquo;k&amp;rdquo; pour préfix d&amp;rsquo;une variable&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
-&lt;p&gt;À part, les manques énoncés, je peux recommander cette formation à toute personne qui souhaite débuter en Flutter, mais pour allez plus loin, je lui conseillerais de lire des articles et de s&#39;inscrire aux divers newsletters existants sur le sujet.&lt;/p&gt;
-&lt;p&gt;Cela reste une expérience positive, et après avoir fini l&#39;ensemble des sections vous obtiendrez une certification de complétion.
+&lt;p&gt;À part, les manques énoncés, je peux recommander cette formation à toute personne qui souhaite débuter en Flutter, mais pour allez plus loin, je lui conseillerais de lire des articles et de s&amp;rsquo;inscrire aux divers newsletters existants sur le sujet.&lt;/p&gt;
+&lt;p&gt;Cela reste une expérience positive, et après avoir fini l&amp;rsquo;ensemble des sections vous obtiendrez une certification de complétion.
 &lt;figure&gt;
     &lt;img src=&#34;https://cedriccreusot.fr/images/flutter_bootcamp_certifs.jpg&#34;/&gt; &lt;figcaption&gt;
             &lt;h4&gt;Certificat Complétion Bootcamp Flutter&lt;/h4&gt;
@@ -658,31 +704,31 @@ Je me suis dit que c&#39;était une bonne idée de faire ce Bootcamp pour me for
        
        <guid>https://cedriccreusot.fr/posts/bilan-plan-2020/</guid>
        <description>&lt;p&gt;Bonjour,&lt;/p&gt;
-&lt;p&gt;Premiers jours de l&#39;année, j&#39;ai enfin pris la décision d&#39;ouvrir un blog, avant, de vous parler des objectifs que je me fixe pour celui-ci. Faisons le bilan de cette année.&lt;/p&gt;
+&lt;p&gt;Premiers jours de l&amp;rsquo;année, j&amp;rsquo;ai enfin pris la décision d&amp;rsquo;ouvrir un blog, avant, de vous parler des objectifs que je me fixe pour celui-ci. Faisons le bilan de cette année.&lt;/p&gt;
 &lt;h2 id=&#34;bilan-2019&#34;&gt;Bilan 2019&lt;/h2&gt;
-&lt;p&gt;En 2018, j&#39;ai intégré la fine équipe de beNext. Cela fait plus d&#39;un an que je suis chez eux. J&#39;ai vécu cette année, pas mal de choses sur le plan personnel et professionnel.&lt;/p&gt;
+&lt;p&gt;En 2018, j&amp;rsquo;ai intégré la fine équipe de beNext. Cela fait plus d&amp;rsquo;un an que je suis chez eux. J&amp;rsquo;ai vécu cette année, pas mal de choses sur le plan personnel et professionnel.&lt;/p&gt;
 &lt;h3 id=&#34;professionnellement&#34;&gt;Professionnellement&lt;/h3&gt;
-&lt;p&gt;Tout-à-bord, j&#39;ai découvert une autre façon de s&#39;organiser au sein d&#39;une société. L&#39;holacratie. Plus que d&#39;essayer de vous l&#39;expliquer maladroitement, je préfère vous orienter vers Pablo Pernot qui en parle bien mieux sur son propre &lt;a href=&#34;https://pablopernot.fr/2017/12/petite-serie-sur-holacratie-et-sociocratie/&#34;&gt;blog&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;J&#39;ai permis plusieurs fois au Meetup &lt;a href=&#34;https://www.meetup.com/fr-FR/Flutter-Paris/&#34;&gt;Flutter Paris&lt;/a&gt; de s&#39;organiser chez beNext.&lt;/p&gt;
-&lt;p&gt;J&#39;y ai même participé en tant qu&#39;orateur sur un sujet que l&#39;on oublie bien souvent dans nos projets, l&#39;accessibilité.
+&lt;p&gt;Tout-à-bord, j&amp;rsquo;ai découvert une autre façon de s&amp;rsquo;organiser au sein d&amp;rsquo;une société. L&amp;rsquo;holacratie. Plus que d&amp;rsquo;essayer de vous l&amp;rsquo;expliquer maladroitement, je préfère vous orienter vers Pablo Pernot qui en parle bien mieux sur son propre &lt;a href=&#34;https://pablopernot.fr/2017/12/petite-serie-sur-holacratie-et-sociocratie/&#34;&gt;blog&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;J&amp;rsquo;ai permis plusieurs fois au Meetup &lt;a href=&#34;https://www.meetup.com/fr-FR/Flutter-Paris/&#34;&gt;Flutter Paris&lt;/a&gt; de s&amp;rsquo;organiser chez beNext.&lt;/p&gt;
+&lt;p&gt;J&amp;rsquo;y ai même participé en tant qu&amp;rsquo;orateur sur un sujet que l&amp;rsquo;on oublie bien souvent dans nos projets, l&amp;rsquo;accessibilité.
 
 &lt;div style=&#34;position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;&#34;&gt;
   &lt;iframe src=&#34;https://www.youtube.com/embed/EqInAYQMYT8&#34; style=&#34;position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;&#34; allowfullscreen title=&#34;YouTube Video&#34;&gt;&lt;/iframe&gt;
 &lt;/div&gt;
 &lt;/p&gt;
-&lt;p&gt;J&#39;ai commencé à faire des sessions de coaching perso, pour m&#39;améliorer dans ma communication.&lt;/p&gt;
-&lt;p&gt;Vers la fin d&#39;année (septembre, octobre), j&#39;ai commencé à mentorer techniquement 1 beNexter. Cette expérience m’a montré que j&#39;aimais transmettre, d&#39;où l&#39;intérêt pour moi d&#39;ouvrir ce blog.&lt;/p&gt;
-&lt;p&gt;J&#39;ai intégré un cercle de coach technique à beNext.&lt;/p&gt;
-&lt;p&gt;Enfin, j&#39;ai coorganisé un des évènements au sein de beNext, le beCom Tech (je n&#39;étais pas du tout dans ma zone de confort à ce moment-là, surtout en période de grève des transports à Paris).&lt;/p&gt;
+&lt;p&gt;J&amp;rsquo;ai commencé à faire des sessions de coaching perso, pour m&amp;rsquo;améliorer dans ma communication.&lt;/p&gt;
+&lt;p&gt;Vers la fin d&amp;rsquo;année (septembre, octobre), j&amp;rsquo;ai commencé à mentorer techniquement 1 beNexter. Cette expérience m’a montré que j&amp;rsquo;aimais transmettre, d&amp;rsquo;où l&amp;rsquo;intérêt pour moi d&amp;rsquo;ouvrir ce blog.&lt;/p&gt;
+&lt;p&gt;J&amp;rsquo;ai intégré un cercle de coach technique à beNext.&lt;/p&gt;
+&lt;p&gt;Enfin, j&amp;rsquo;ai coorganisé un des évènements au sein de beNext, le beCom Tech (je n&amp;rsquo;étais pas du tout dans ma zone de confort à ce moment-là, surtout en période de grève des transports à Paris).&lt;/p&gt;
 &lt;h3 id=&#34;personnellement&#34;&gt;Personnellement&lt;/h3&gt;
-&lt;p&gt;En 2019, dans une optique de développer mes compétences dans plein de domaine différent et suite à diverse discussion voici une liste de livre et formations que j&#39;ai lus et suivis :&lt;/p&gt;
+&lt;p&gt;En 2019, dans une optique de développer mes compétences dans plein de domaine différent et suite à diverse discussion voici une liste de livre et formations que j&amp;rsquo;ai lus et suivis :&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;Livre fini :
 &lt;ul&gt;
 &lt;li&gt;107 principes immobiliers&lt;/li&gt;
-&lt;li&gt;Créer et piloter un portefeuille d&#39;ETF&lt;/li&gt;
+&lt;li&gt;Créer et piloter un portefeuille d&amp;rsquo;ETF&lt;/li&gt;
 &lt;li&gt;Épargnant 3.0&lt;/li&gt;
-&lt;li&gt;Tout le monde n&#39;a pas eu la chance de rater ses études&lt;/li&gt;
+&lt;li&gt;Tout le monde n&amp;rsquo;a pas eu la chance de rater ses études&lt;/li&gt;
 &lt;li&gt;Avalez le crapaud&lt;/li&gt;
 &lt;li&gt;Les quatre accords toltèques&lt;/li&gt;
 &lt;li&gt;Les mots sont des fenêtres&lt;/li&gt;
@@ -692,16 +738,16 @@ Je me suis dit que c&#39;était une bonne idée de faire ce Bootcamp pour me for
 &lt;/li&gt;
 &lt;li&gt;Formations finies :
 &lt;ul&gt;
-&lt;li&gt;Devenir Riche. Mode d&#39;Emploi. (Luc Brialy)&lt;/li&gt;
-&lt;li&gt;Immobilier. Mode d&#39;Emploi. (Luc Brialy)&lt;/li&gt;
+&lt;li&gt;Devenir Riche. Mode d&amp;rsquo;Emploi. (Luc Brialy)&lt;/li&gt;
+&lt;li&gt;Immobilier. Mode d&amp;rsquo;Emploi. (Luc Brialy)&lt;/li&gt;
 &lt;li&gt;The Complete Flutter Development Bootcamp Using Dart (&lt;a href=&#34;https://appbrewery.co&#34;&gt;https://appbrewery.co&lt;/a&gt;)&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;li&gt;Livre en cours :
 &lt;ul&gt;
-&lt;li&gt;10 Days to Faster Reading (que je n&#39;ai pas finis)&lt;/li&gt;
+&lt;li&gt;10 Days to Faster Reading (que je n&amp;rsquo;ai pas finis)&lt;/li&gt;
 &lt;li&gt;Conception et programmation orientées objet (B. Meyer)&lt;/li&gt;
-&lt;li&gt;Le livre de l&#39;Ikigai&lt;/li&gt;
+&lt;li&gt;Le livre de l&amp;rsquo;Ikigai&lt;/li&gt;
 &lt;li&gt;Pouvoir illimité : le livre majeur sur la PNL&lt;/li&gt;
 &lt;li&gt;Écrire un scénario interactif&lt;/li&gt;
 &lt;/ul&gt;
@@ -713,26 +759,26 @@ Je me suis dit que c&#39;était une bonne idée de faire ce Bootcamp pour me for
 &lt;/ul&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Cela fait une sacrée liste, que je compte continuer d&#39;étoffer durant cette année.&lt;/p&gt;
-&lt;p&gt;De plus, je suis quelqu&#39;un de sportif, en plus d&#39;aller à la salle, je m&#39;adonne au sport de combat au sabre laser (&lt;a href=&#34;http://www.france.ludosport.net/&#34;&gt;http://www.france.ludosport.net/&lt;/a&gt;), cette année j&#39;ai passé mon examen de forme 2 et commencer à suivre la formation de la forme dite Y qui nous fait une preview de toutes les formes de combat.
-J&#39;ai participé en tant que spectateur au tournoi international, le niveau y est incroyable, et l&#39;année prochaine, je souhaiterais y participer (+3h de live pour vous donner un exemple).
+&lt;p&gt;Cela fait une sacrée liste, que je compte continuer d&amp;rsquo;étoffer durant cette année.&lt;/p&gt;
+&lt;p&gt;De plus, je suis quelqu&amp;rsquo;un de sportif, en plus d&amp;rsquo;aller à la salle, je m&amp;rsquo;adonne au sport de combat au sabre laser (&lt;a href=&#34;http://www.france.ludosport.net/&#34;&gt;http://www.france.ludosport.net/&lt;/a&gt;), cette année j&amp;rsquo;ai passé mon examen de forme 2 et commencer à suivre la formation de la forme dite Y qui nous fait une preview de toutes les formes de combat.
+J&amp;rsquo;ai participé en tant que spectateur au tournoi international, le niveau y est incroyable, et l&amp;rsquo;année prochaine, je souhaiterais y participer (+3h de live pour vous donner un exemple).
 
 &lt;div style=&#34;position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;&#34;&gt;
   &lt;iframe src=&#34;https://www.youtube.com/embed/OkDdQq9ldNg&#34; style=&#34;position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;&#34; allowfullscreen title=&#34;YouTube Video&#34;&gt;&lt;/iframe&gt;
 &lt;/div&gt;
 &lt;/p&gt;
 &lt;h2 id=&#34;objectif-2020&#34;&gt;Objectif 2020&lt;/h2&gt;
-&lt;p&gt;Pour 2020, j&#39;ai plusieurs objectifs dans le désordre :&lt;/p&gt;
+&lt;p&gt;Pour 2020, j&amp;rsquo;ai plusieurs objectifs dans le désordre :&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;Pour ce blog, écrire 4 articles par semestres, dans le but de vous apprendre des choses.&lt;/li&gt;
 &lt;li&gt;Continuer ma lecture de livre de développement personnel.&lt;/li&gt;
 &lt;li&gt;Sortir une application de jeu sur mobile/web en Flutter.&lt;/li&gt;
 &lt;li&gt;Participer au tournoi national de combat de sabre laser de Ludosport.&lt;/li&gt;
-&lt;li&gt;M&#39;améliorer dans mon organisation personnelle en essayant la méthode ZTD.&lt;/li&gt;
-&lt;li&gt;Perdre du poids (oui, c&#39;est important quand on prend 10Kg de viennoiserie&amp;hellip;)&lt;/li&gt;
+&lt;li&gt;M&amp;rsquo;améliorer dans mon organisation personnelle en essayant la méthode ZTD.&lt;/li&gt;
+&lt;li&gt;Perdre du poids (oui, c&amp;rsquo;est important quand on prend 10Kg de viennoiserie&amp;hellip;)&lt;/li&gt;
 &lt;li&gt;Expérimentez, expérimentez, expérimentez !&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;Bon, je m&#39;arrête ici, car je risquerais de tout, et rien faire en même temps.&lt;/p&gt;
+&lt;p&gt;Bon, je m&amp;rsquo;arrête ici, car je risquerais de tout, et rien faire en même temps.&lt;/p&gt;
 &lt;p&gt;Si je ne dois en garder que 3 :&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;&lt;strong&gt;Perdre du poids&lt;/strong&gt;&lt;/li&gt;
