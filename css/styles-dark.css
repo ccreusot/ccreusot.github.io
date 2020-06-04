@@ -148,7 +148,7 @@ time {
 }
 
 #container main article > pre {
-  background-color: #ffffcc;
+  background-color: lightslategrey;
   overflow-x: auto;
   padding: 0.8em;
   font-size: 0.9em;
@@ -161,7 +161,7 @@ time {
 
 #container main article p code {
   padding: 0.2em;
-  background-color: #ffcccc;
+  background-color:lightslategrey;
   font-size: 0.9em;
 }
 
@@ -265,6 +265,7 @@ a {
 .image, figure img, img {
   width: 100%;
   box-shadow: 0 3px 3px #bbbbbb;
+  background-color: lightslategrey;
 }
 
 .full-image, figure.full img, img[src*="full"] {
