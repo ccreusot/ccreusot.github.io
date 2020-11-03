@@ -7,10 +7,56 @@
    <generator>Hugo -- gohugo.io</generator>
    <language>fr-fr</language>
    <copyright>Copyright &amp;copy; 2019 - Cédric Creusot</copyright>
-   <lastBuildDate>Thu, 04 Jun 2020 14:27:07 +0200</lastBuildDate>
+   <lastBuildDate>Mon, 02 Nov 2020 18:16:56 +0200</lastBuildDate>
    
        <atom:link href="https://cedriccreusot.fr/tags/index.xml" rel="self" type="application/rss+xml" />
    
+   
+     <item>
+       <title>Rex Mob Programming</title>
+       <link>https://cedriccreusot.fr/posts/rex-mob-programming/</link>
+       <pubDate>Mon, 02 Nov 2020 18:16:56 +0200</pubDate>
+       
+       <guid>https://cedriccreusot.fr/posts/rex-mob-programming/</guid>
+       <description>&lt;p&gt;Il y a quelques semaines, je fus coorganisateurs avec mon collègue Jordan d&amp;rsquo;un évent à beNext, le beCome-mobile pour toute une après-midi, où nous pouvions tout y faire à notre sauce, un peu comme un burger de chez Five Guys, rien que pour la communauté mobile.&lt;/p&gt;
+&lt;p&gt;Donc comme à Five Guys nous avons présenté les possibilités du menu à la communauté. J&amp;rsquo;aurai bien mis du Flutter à toutes les sauces, mais la communauté mobile en décida autrement ! Elle choisit un atelier pour s&amp;rsquo;améliorer en Clean Architecture.&lt;/p&gt;
+&lt;p&gt;Il est bien vrai que l&amp;rsquo;on en parle beaucoup de cette Clean Architecture. On n’a pas souvent tous l&amp;rsquo;occasion de travailler sur une application qui la respecte à la lettre.&lt;/p&gt;
+&lt;p&gt;Nous avons donc décidé de faire un atelier de mob-programming ou l&amp;rsquo;enjeu était de coder l&amp;rsquo;équivalent d&amp;rsquo;une borne de billetterie de cinéma.&lt;/p&gt;
+&lt;p&gt;Faire du mob-programming en communauté mobile ? Avec des développeurs iOS et Android ? C&amp;rsquo;est possible. Dans un premier temps, il faut choisir le langage.&lt;/p&gt;
+&lt;p&gt;Pour notre expérience, nous sommes parties sur du Kotlin. Il est assez similaire à Swift sur certains points et assez simple à lire pour tout le monde.&lt;/p&gt;
+&lt;p&gt;Faire une application Android ? Que nenni très cher lecteur ! L&amp;rsquo;idée était de retirer la plateforme du problème, ainsi que l&amp;rsquo;interface graphique !&lt;/p&gt;
+&lt;h2 id=&#34;mob-programming-en-période-de-covid&#34;&gt;Mob-programming en période de COVID&lt;/h2&gt;
+&lt;p&gt;Tout d&amp;rsquo;abord le mob-programming, c&amp;rsquo;est quoi ?&lt;/p&gt;
+&lt;p&gt;Réunissez une équipe de développeurs, avec un ordinateur et un rétroprojecteur et chacun leur tour les développeurs échangent leur place pour aller taper sur ledit ordinateur.&lt;/p&gt;
+&lt;p&gt;Bien entendu, il n&amp;rsquo;y a pas qu&amp;rsquo;un seul rôle, ceux qui ne codent pas, sont considérés comme des navigateurs. Un développeur est élu lead navigateur pour indiquer, ce que doit écrire le développeur devant l&amp;rsquo;ordinateur.&lt;/p&gt;
+&lt;p&gt;Durant cet atelier, il peut y avoir un facilitateur, un coach, une personne experte du métier. Toutes les parties prenant à l&amp;rsquo;expérience. N&amp;rsquo;oublions pas un grand tableau blanc pour pouvoir y dessiner des solutions.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&amp;ldquo;Mais dis-moi ! Ce n’est pas très COVID de s&amp;rsquo;échanger le clavier !&amp;rdquo;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Tout à fait ! c&amp;rsquo;est pourquoi on c&amp;rsquo;est organisé un peu autrement.&lt;/p&gt;
+&lt;p&gt;Pour l&amp;rsquo;exercice Jordan était chargé de jouer le rôle de facilitateurs et expert du métier.&lt;/p&gt;
+&lt;p&gt;Pour ma part, je devais taper tout ce que me disaient les navigateurs.&lt;/p&gt;
+&lt;h2 id=&#34;le-dynamisme-du-début&#34;&gt;Le dynamisme du début&lt;/h2&gt;
+&lt;p&gt;C&amp;rsquo;est donc devant mon clavier que j&amp;rsquo;attendais sagement les demandes de mes collègues.&lt;/p&gt;
+&lt;p&gt;Premier constat : beaucoup de discussion pour savoir quoi faire, choisir par quoi commencer, etc.&lt;/p&gt;
+&lt;p&gt;Il nous aura fallut une 30 aines de minute pour taper les premières lignes, et enfin 20 min pour ce décider de réaliser le premier cas d&amp;rsquo;utilisation.&lt;/p&gt;
+&lt;p&gt;De mon point de vue ce fut le laborieux, on a pu constaté que ceux qui ont déjà l&amp;rsquo;habitude ou qui aime participer par eux même étaient les principaux leads durant l&amp;rsquo;exercice. Or ça ne se limitait qu&amp;rsquo;à quelques personnes et moi constatant que l&amp;rsquo;autre moitié des participants était soit endormie, soit en train de regarder leurs smartphones.&lt;/p&gt;
+&lt;p&gt;Après une petite pause proposée par Jordan ou l&amp;rsquo;on a pu en discuter, nous avons décidé de changer de fusil d&amp;rsquo;épaule.&lt;/p&gt;
+&lt;h2 id=&#34;la-seconde-moitié-plus-dynamique-&#34;&gt;La seconde moitié plus dynamique !&lt;/h2&gt;
+&lt;p&gt;Pour cette seconde moitié, nous avons mis en place la règle des 2.&lt;/p&gt;
+&lt;p&gt;Nous prenons 2 personnes au hasard et pendant environ 5-10 min celles-ci ont la parole. Les autres peuvent intervenir, mais ce sont les sélectionnés qui me dictent quoi écrire.&lt;/p&gt;
+&lt;p&gt;Ce fut, un exercice bien plus fluide à partir de cet instant.&lt;/p&gt;
+&lt;p&gt;Les gens participaient finalement plus par eux même.&lt;/p&gt;
+&lt;p&gt;Des discussions sur des choix techniques puis des décisions étaient vite prises.&lt;/p&gt;
+&lt;p&gt;Tout le monde participait.&lt;/p&gt;
+&lt;h2 id=&#34;au-final&#34;&gt;Au final&lt;/h2&gt;
+&lt;p&gt;Ce fut un bon exercice pour Jordan et moi, l&amp;rsquo;émulsion que nous avons eue à la fin était bien plus agréable pour tous.&lt;/p&gt;
+&lt;p&gt;Je retiens que mettre des rôles tournant avec un timer dès le départ est crucial pour cet exercice.&lt;/p&gt;
+&lt;p&gt;Ensuite, peut-être mettre en place des outils en ligne telle que LiveShare pour faire tourner le rôle de la personne devant le clavier.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/ccreusot/clean-cinema&#34;&gt;source: Le résultat de la session de mob, non modifié&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://en.wikipedia.org/wiki/Mob_programming&#34;&gt;source: Wikipedia&lt;/a&gt;&lt;/p&gt;
+</description>
+     </item>
    
      <item>
        <title>Utilisation de Timer avec Flutter</title>
