@@ -13,6 +13,99 @@
    
    
      <item>
+       <title>Ma Premiere Formation</title>
+       <link>https://cedriccreusot.fr/posts/ma-premiere-formation/</link>
+       <pubDate>Tue, 02 Feb 2021 20:00:00 +0100</pubDate>
+       
+       <guid>https://cedriccreusot.fr/posts/ma-premiere-formation/</guid>
+       <description>&lt;p&gt;Petit article sur la création et la réalisation d&amp;rsquo;une formation d&amp;rsquo;une journée sur Flutter.&lt;/p&gt;
+&lt;h2 id=&#34;une-formation-en-une-journée-&#34;&gt;Une formation en une journée ?&lt;/h2&gt;
+&lt;p&gt;Faire une formation prend du temps, il faut réfléchir à ce que l&amp;rsquo;on doit mettre jusqu&amp;rsquo;à quel point on peut rentrer dans un sujet.&lt;/p&gt;
+&lt;p&gt;Pour ma part, dans le cadre de mon travail à beNext, je devais réaliser une formation Flutter qui s&amp;rsquo;étendrait sur une journée.&lt;/p&gt;
+&lt;p&gt;Comment prévoit-on une formation sur un framework si complexe pour faire tenir tout un programme sur une seule journée.&lt;/p&gt;
+&lt;p&gt;Flutter en lui-même a énormément de concept à comprendre. Comme la programmation déclarative vs la programmation impérative&amp;hellip;&lt;/p&gt;
+&lt;p&gt;J&amp;rsquo;ai d&amp;rsquo;abord essayé d&amp;rsquo;émettre un plan de formation, avec différents objectifs:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Appréhender rapidement le développement avec le langage Dart&lt;/li&gt;
+&lt;li&gt;Fondamentaux de Flutter&lt;/li&gt;
+&lt;li&gt;Développer une application multiplateforme (iOS/Android)&lt;/li&gt;
+&lt;li&gt;Tester une lib de Statemanagement&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Il m&amp;rsquo;a fallu évaluer la difficulté des différents objectifs avec l&amp;rsquo;aide de mes collègues.&lt;/p&gt;
+&lt;p&gt;Je devais faire tenir tous ses petits objectifs en une journée. Il m&amp;rsquo;a fallu faire des choix.&lt;/p&gt;
+&lt;p&gt;J&amp;rsquo;ai sacrifié l&amp;rsquo;appréhension du langage Dart, et le test d&amp;rsquo;une lib de Statemanagement par un focus sur Flutter.&lt;/p&gt;
+&lt;p&gt;J&amp;rsquo;en suis arrivé à ce programme :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Fondamentaux de Flutter&lt;/li&gt;
+&lt;li&gt;Développer une application multiplateforme (iOS/Android)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;C&amp;rsquo;est en prenant ces 2 objectifs que j&amp;rsquo;ai pu construire ma première formation sur Flutter, une introduction d&amp;rsquo;une journée.&lt;/p&gt;
+&lt;h2 id=&#34;ma-formation--introduction-à-flutter&#34;&gt;Ma Formation : Introduction à Flutter&lt;/h2&gt;
+&lt;p&gt;Que se passe-t-il dans cette formation ?&lt;/p&gt;
+&lt;p&gt;Durant 1 journée, nous passerons le matin et l&amp;rsquo;après-midi ensemble, à distance ou en télétravail, cette formation n&amp;rsquo;est pas attachée au lieu de réalisation de celle-ci.&lt;/p&gt;
+&lt;p&gt;Voici comment ce découpe la journée :&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;IceBreaker&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Utile pour connaitre l&amp;rsquo;ensemble des membres participants.&lt;/p&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;Une Présentation&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Durant cette présentation, je fais le tour du Framework avec un storytelling et une petite démonstration qui nous accompagne durant la présentation.&lt;/p&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;Le Mob-Programming&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Le meilleur moyen pour moi pour que tout le monde arrive à monter en compétence sur la techno en une journée est par la pratique.
+Durant ce mob-programming, nous réaliserons une petite application. Vous ne resterez pas inactif, chacun des participants doit coder quand vient leur tour.
+Les autres doivent aidé celui qui code en ayant la documentation du Framework à disposition.
+Vous n&amp;rsquo;êtes pas lâché seul durant cette partie. Je vous accompagne en encadrant la rotation de la personne qui code et je vous aide quand vous êtes bloqué, ou pour expliqué le fonctionnement de certains composants.&lt;/p&gt;
+&lt;ol start=&#34;4&#34;&gt;
+&lt;li&gt;Rétrospective de la journée&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Ce dernier point est là pour voir ce que l&amp;rsquo;on a appris, aimer pratiquer et me faire des retours directs.&lt;/p&gt;
+&lt;h2 id=&#34;dans-la-pratique--mini-rex&#34;&gt;Dans la pratique : mini Rex&lt;/h2&gt;
+&lt;p&gt;J&amp;rsquo;ai pu mettre en pratique cette journée de formation en télétravail, profitant qu&amp;rsquo;elle est encore fraiche dans ma tête, je vous fais part de mon retour d&amp;rsquo;expérience.&lt;/p&gt;
+&lt;p&gt;Le début de journée, c&amp;rsquo;est plutôt bien passer. L&amp;rsquo;Icebreaker était efficace pour nous aider à nous connaitre, comme nous allions passer la journée ensemble sauf pour la pause de midi.&lt;/p&gt;
+&lt;p&gt;&lt;figure&gt;
+    &lt;img src=&#34;https://cedriccreusot.fr/images/formation_presentation_flutter1.jpg&#34;/&gt; &lt;figcaption&gt;
+            &lt;h4&gt;Premier slide de la présentation&lt;/h4&gt;
+        &lt;/figcaption&gt;
+&lt;/figure&gt;
+
+La présentation est là pour introduire Flutter au participant. Ils m&amp;rsquo;ont remonté qu&amp;rsquo;à la fin de celle-ci, ils auraient aimé avoir une démo pour se servir correctement de la documentation.&lt;/p&gt;
+&lt;p&gt;Je n&amp;rsquo;y avais pas pensé, mais pour les prochaines fois, cela sera fait.&lt;/p&gt;
+&lt;p&gt;Pour le mob-programming, j&amp;rsquo;ai mis a disposition mon VS code avec LiveShare ainsi qu&amp;rsquo;un partage d&amp;rsquo;écrans pour leur montrer ce qui se passait sur mon appareil pour qu&amp;rsquo;ils aient un retour visuel grâce au Hot Reload.&lt;/p&gt;
+&lt;p&gt;J&amp;rsquo;ai mis en place un chrono de 5 min par personne pour coder chacun leur tour. Le fait d&amp;rsquo;avoir mis ce chrono les a maintenus concentrés ensemble sur le code. Nous avons fait face à quelque difficulté au démarrage.&lt;/p&gt;
+&lt;p&gt;J&amp;rsquo;ai voulu répondre favorablement à une demande du client qui était d&amp;rsquo;utiliser le mode nullsafety du Framework qui est encore en beta. Malheur m&amp;rsquo;en a pris, heureusement retourner vers la version stable nous a sauvés et nous avons pu reprendre la formation dans de meilleures conditions.&lt;/p&gt;
+&lt;p&gt;L&amp;rsquo;objectif du mob-programming était d&amp;rsquo;avoir une application de météo. J&amp;rsquo;ai fait le choix pour cette première de leurs laissés libre cours à leurs imaginations, ça leur à plus, mais ils auraient bien aimé avoir un cadre,
+par exemple des écrans avec les différents Widget qui leur saurait associé.&lt;/p&gt;
+&lt;p&gt;La finalité, c&amp;rsquo;est qu&amp;rsquo;ils ont réussi à faire une petite application de météo.&lt;/p&gt;
+&lt;p&gt;&lt;figure&gt;
+    &lt;img src=&#34;https://cedriccreusot.fr/images/formation_result1.png&#34;/&gt; &lt;figcaption&gt;
+            &lt;h4&gt;Screenshot liste des villes&lt;/h4&gt;
+        &lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;figure&gt;
+    &lt;img src=&#34;https://cedriccreusot.fr/images/formation_result2.png&#34;/&gt; &lt;figcaption&gt;
+            &lt;h4&gt;Screenshot détail de la météo pour la ville sélectionnée&lt;/h4&gt;
+        &lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;/p&gt;
+&lt;p&gt;Elle ne paye pas de mine, mais l&amp;rsquo;effort pour la réaliser ensemble leur a plu, et ils en sont sortis avec un bon sentiment. C&amp;rsquo;est ce que je souhaitais, une formation qui soit agréable pour tout le monde.
+Pour eux, pour qu&amp;rsquo;ils grandissent ensemble, pour moi pour grandir dans ma connaissance.&lt;/p&gt;
+&lt;p&gt;Le projet de cette formation est disponible ici avec une version complète.
+&lt;a href=&#34;https://github.com/ccreusot/codelab_weather_app&#34;&gt;&lt;strong&gt;Code source pour la formation&lt;/strong&gt;&lt;/a&gt; vous trouverez la branche de cette première formation sur la branche &lt;strong&gt;formation_26012021&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Sur la toute dernière heure, je leur ai montré une version exemple de ce qu&amp;rsquo;il est possible de réaliser en Dart et Flutter, avec un Statemanagement. Je retiens que faire ce genre de présentation en fin de journée après une grosse session de mob-programming n&amp;rsquo;est pas la meilleure des idées.&lt;/p&gt;
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;Pour conclure, faire une formation demande de l&amp;rsquo;énergie et de s&amp;rsquo;interroger, d&amp;rsquo;essayer de ce calibré au niveau des formés. Ce fut quelque chose de difficile pour moi, sans connaitre les participants, je ne pouvais qu&amp;rsquo;imaginer.&lt;/p&gt;
+&lt;p&gt;J&amp;rsquo;ai pris une décision assez radicale en ne leur montrant aucune base de Dart. Cela a du bon, ne pas montrer peux aidé a prouver que finalement, ne pas avoir les bases du langage n&amp;rsquo;empêche pas de produire quelque chose.&lt;/p&gt;
+&lt;p&gt;La montée en compétence est aisée, pour ceux qui se le demandent, aucun des participants n&amp;rsquo;avait une réelle expérience en Dart, mais tous étaient des développeurs confirmés sur leur domaine de prédilection.&lt;/p&gt;
+&lt;p&gt;Ensuite, je retiens qu&amp;rsquo;il est nécessaire pour ce type de formation de fournir un atelier pour se retrouver dans la documentation. Qu&amp;rsquo;il serait pratique d&amp;rsquo;avoir un exemple d&amp;rsquo;écrans avec des Widgets qui pourrait aider à les réaliser l&amp;rsquo;application.&lt;/p&gt;
+&lt;p&gt;Ce fut une bonne expérience, j&amp;rsquo;ai appris en étant complètement hors de ma zone de confort. C&amp;rsquo;est une expérience avec le recul, que je reproduirais volontiers.&lt;/p&gt;
+</description>
+     </item>
+   
+     <item>
        <title>Rex Mob Programming</title>
        <link>https://cedriccreusot.fr/posts/rex-mob-programming/</link>
        <pubDate>Mon, 02 Nov 2020 18:16:56 +0200</pubDate>
